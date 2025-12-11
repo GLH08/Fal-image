@@ -180,6 +180,84 @@ docker-compose up -d --build  # 重新构建
 - 🛡️ 速率限制和安全防护
 - 🐳 Docker 一键部署
 
+## Nginx 反向代理配置
+
+生产环境建议使用 Nginx 反向代理，并将端口绑定到 `127.0.0.1`：
+
+```yaml
+# docker-compose.ghcr.yml 修改端口绑定
+ports:
+  - "127.0.0.1:8787:8787"
+```
+
+Nginx 配置示例：
+
+```nginx
+# 需要在 http 块添加
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
+server {
+    listen 80;
+    server_name your-domain.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name your-domain.com;
+
+    ssl_certificate /path/to/fullchain.pem;
+    ssl_certificate_key /path/to/privkey.pem;
+
+    # SSL 优化
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # 安全头
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # 请求体大小（支持图片上传）
+    client_max_body_size 50M;
+
+    # Gzip 压缩
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml image/svg+xml;
+    gzip_min_length 1000;
+
+    location / {
+        proxy_pass http://localhost:8787;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+
+        proxy_cache_bypass $http_upgrade;
+
+        # 超时设置（图像生成需要较长时间）
+        proxy_connect_timeout 300s;
+        proxy_send_timeout 300s;
+        proxy_read_timeout 300s;
+
+        # 禁用缓冲（实时响应）
+        proxy_buffering off;
+    }
+}
+```
+
 ## License
 
 MIT
