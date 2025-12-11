@@ -1,0 +1,36 @@
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# GitHub
+.github/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Data
+data/
+*.log
+
+# Documentation
+*.md
+!README.md
+
+# Test
+test/
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db

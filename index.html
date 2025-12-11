@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fal.ai Image Generator</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --glass-bg: rgba(15, 23, 42, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #818cf8;
+            --accent-hover: #6366f1;
+            --danger-color: #ef4444;
+            --input-bg: rgba(0, 0, 0, 0.3);
+            --card-hover-border: rgba(129, 140, 248, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding-top: 1rem;
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0) 100%);
+            backdrop-filter: blur(2px);
+        }
+
+        .tab-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(129, 140, 248, 0.4);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .view {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .view.active {
+            display: grid;
+        }
+
+        #generator-view,
+        #collection-view {
+            grid-template-columns: 380px 1fr;
+            gap: 2.5rem;
+            align-items: start;
+            /* Important for sticky sidebar */
+        }
+
+        @media (max-width: 900px) {
+
+            #generator-view,
+            #collection-view {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                position: static !important;
+            }
+        }
+
+        .controls {
+            background: var(--glass-bg);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 2rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.hidden {
+            display: none;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        select,
+        input,
+        textarea {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 0.875rem;
+            border-radius: 0.75rem;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        select:focus,
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.2);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.5;
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            filter: grayscale(0.5);
+        }
+
+        #gallery-view,
+        #collection-gallery {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .result-card {
+            background: var(--glass-bg);
+            border-radius: 1.5rem;
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+
+        .result-card:hover {
+            border-color: var(--card-hover-border);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.4);
+        }
+
+        .image-container {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            transition: transform 0.5s;
+        }
+
+        .result-card:hover .image-container img {
+            transform: scale(1.02);
+        }
+
+        .image-details {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prompt-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            white-space: pre-wrap;
+            flex-grow: 1;
+            max-height: 150px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .meta-info {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-tag {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: auto;
+        }
+
+        .action-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .action-btn.danger:hover {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border-color: var(--danger-color);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+            background: var(--glass-bg);
+            border-radius: 1.5rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            background: var(--glass-bg);
+            border-radius: 1.5rem;
+            border: 1px dashed var(--glass-border);
+            height: 100%;
+            min-height: 400px;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+            color: var(--accent-color);
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .empty-state p {
+            max-width: 300px;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('generator')">Generator</button>
+            <button class="tab-btn" onclick="switchTab('gallery')">Gallery</button>
+            <button class="tab-btn" onclick="switchTab('collection')">Collection</button>
+        </div>
+
+        <!-- Generator View -->
+        <div id="generator-view" class="view active">
+            <div class="controls">
+                <h1>Fal.ai Generator</h1>
+
+                <div class="form-group">
+                    <label for="model">Model</label>
+                    <select id="model" onchange="updateControls()">
+                        <option value="flux-1.1-pro-ultra">Flux 1.1 Pro Ultra</option>
+                        <option value="flux-2-pro">FLUX 2 Pro</option>
+                        <option value="imagen4-preview">Imagen 4 Preview</option>
+                        <option value="nano-banana-pro">Nano Banana Pro</option>
+                        <option value="flux-2-pro-edit">FLUX 2 Pro Edit</option>
+                        <option value="nano-banana-pro-edit">Gemini 3 Pro Image Edit</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="control-aspect-ratio">
+                    <label for="aspect_ratio">Aspect Ratio</label>
+                    <select id="aspect_ratio">
+                        <option value="16:9">16:9 (Landscape)</option>
+                        <option value="1:1" selected>1:1 (Square)</option>
+                        <option value="9:16">9:16 (Portrait)</option>
+                        <option value="4:3">4:3</option>
+                        <option value="3:2">3:2</option>
+                        <option value="2:3">2:3</option>
+                        <option value="3:4">3:4</option>
+                    </select>
+                </div>
+
+                <div class="form-group hidden" id="control-resolution">
+                    <label for="resolution">Resolution</label>
+                    <select id="resolution">
+                        <option value="1K" selected>1K (Standard)</option>
+                        <option value="2K">2K (High)</option>
+                        <option value="4K">4K (Ultra)</option>
+                    </select>
+                </div>
+
+                <div class="form-group hidden" id="control-safety">
+                    <label for="safety_tolerance">Safety Tolerance</label>
+                    <select id="safety_tolerance">
+                        <option value="1">1 (Strict)</option>
+                        <option value="2" selected>2 (Normal)</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5 (Permissive)</option>
+                    </select>
+                </div>
+
+                <div class="form-group hidden" id="control-edit">
+                    <label for="image_url">Source Image URL</label>
+                    <input type="text" id="image_url" placeholder="https://example.com/image.jpg">
+                    <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">Enter the URL of
+                        the image you want to edit</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="prompt">Prompt</label>
+                    <textarea id="prompt" placeholder="Describe the image you want to generate..."></textarea>
+                </div>
+
+                <button id="generateBtn" class="generate-btn">Generate Image</button>
+            </div>
+
+            <div class="gallery" id="current-result">
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <h3>Ready to Create</h3>
+                    <p>Select a model, adjust the settings, and describe your vision to start generating amazing images.
+                    </p>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Generating your masterpiece...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery View -->
+        <div id="gallery-view" class="view">
+            <!-- Auto-generated images will be loaded here -->
+        </div>
+
+        <!-- Collection View -->
+        <div id="collection-view" class="view">
+            <div class="controls">
+                <h1>Manual Collection</h1>
+
+                <div class="form-group">
+                    <label for="manual-url">Image URL</label>
+                    <input type="text" id="manual-url" placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="manual-prompt">Prompt</label>
+                    <textarea id="manual-prompt"
+                        placeholder="Enter the prompt used to generate this image..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="manual-model">Model (Optional)</label>
+                    <input type="text" id="manual-model" placeholder="e.g., DALL-E, Midjourney, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label for="manual-aspect">Aspect Ratio (Optional)</label>
+                    <select id="manual-aspect">
+                        <option value="">Select...</option>
+                        <option value="16:9">16:9</option>
+                        <option value="1:1">1:1</option>
+                        <option value="9:16">9:16</option>
+                        <option value="4:3">4:3</option>
+                    </select>
+                </div>
+
+                <button id="addManualBtn" class="generate-btn">Add to Collection</button>
+            </div>
+
+            <div id="collection-gallery" style="display: grid; margin-top: 0;">
+                <!-- Manual collection items will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generateBtn');
+        const addManualBtn = document.getElementById('addManualBtn');
+        const currentResult = document.getElementById('current-result');
+        const loading = document.getElementById('loading');
+        const galleryView = document.getElementById('gallery-view');
+        const collectionGallery = document.getElementById('collection-gallery');
+
+        updateControls();
+
+        function updateControls() {
+            const model = document.getElementById('model').value;
+            const resolutionGroup = document.getElementById('control-resolution');
+            const safetyGroup = document.getElementById('control-safety');
+            const editGroup = document.getElementById('control-edit');
+            const aspectRatioGroup = document.getElementById('control-aspect-ratio');
+            const aspectRatioSelect = document.getElementById('aspect_ratio');
+            const promptInput = document.getElementById('prompt');
+
+            // Clear prompt when switching models
+            promptInput.value = '';
+
+            // Clear aspect ratio options
+            aspectRatioSelect.innerHTML = '';
+
+            // Model-specific aspect ratios
+            if (model === 'flux-2-pro') {
+                // FLUX 2 Pro supports: square, landscape_16_9, portrait_16_9, landscape_4_3, portrait_4_3
+                const options = [
+                    { value: '1:1', label: '1:1 (Square)' },
+                    { value: '16:9', label: '16:9 (Landscape)' },
+                    { value: '9:16', label: '9:16 (Portrait)' },
+                    { value: '4:3', label: '4:3' },
+                    { value: '3:2', label: '3:2' }
+                ];
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    if (opt.value === '1:1') option.selected = true;
+                    aspectRatioSelect.appendChild(option);
+                });
+            } else if (model === 'imagen4-preview') {
+                // Imagen 4 supports: 1:1, 16:9, 9:16, 4:3, 3:4
+                const options = [
+                    { value: '1:1', label: '1:1 (Square)', selected: true },
+                    { value: '16:9', label: '16:9 (Landscape)' },
+                    { value: '9:16', label: '9:16 (Portrait)' },
+                    { value: '4:3', label: '4:3' },
+                    { value: '3:4', label: '3:4' }
+                ];
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    if (opt.selected) option.selected = true;
+                    aspectRatioSelect.appendChild(option);
+                });
+            } else if (model === 'flux-1.1-pro-ultra') {
+                // FLUX 1.1 Pro Ultra supports many ratios including 21:9 and 9:21
+                const options = [
+                    { value: '21:9', label: '21:9 (Ultra Wide)' },
+                    { value: '16:9', label: '16:9 (Landscape)' },
+                    { value: '4:3', label: '4:3' },
+                    { value: '3:2', label: '3:2' },
+                    { value: '1:1', label: '1:1 (Square)', selected: true },
+                    { value: '2:3', label: '2:3' },
+                    { value: '3:4', label: '3:4' },
+                    { value: '9:16', label: '9:16 (Portrait)' },
+                    { value: '9:21', label: '9:21 (Ultra Tall)' }
+                ];
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    if (opt.selected) option.selected = true;
+                    aspectRatioSelect.appendChild(option);
+                });
+            } else if (model === 'nano-banana-pro') {
+                // Nano Banana Pro supports: 21:9, 16:9, 3:2, 4:3, 5:4, 1:1, 4:5, 3:4, 2:3, 9:16
+                const options = [
+                    { value: '21:9', label: '21:9 (Ultra Wide)' },
+                    { value: '16:9', label: '16:9 (Landscape)' },
+                    { value: '3:2', label: '3:2' },
+                    { value: '4:3', label: '4:3' },
+                    { value: '5:4', label: '5:4' },
+                    { value: '1:1', label: '1:1 (Square)', selected: true },
+                    { value: '4:5', label: '4:5' },
+                    { value: '3:4', label: '3:4' },
+                    { value: '2:3', label: '2:3' },
+                    { value: '9:16', label: '9:16 (Portrait)' }
+                ];
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    if (opt.selected) option.selected = true;
+                    aspectRatioSelect.appendChild(option);
+                });
+            } else if (model === 'flux-2-pro-edit') {
+                // FLUX 2 Pro Edit supports the same aspect ratios as FLUX 2 Pro (uses image_size with auto option)
+                const options = [
+                    { value: '1:1', label: '1:1 (Square)' },
+                    { value: '16:9', label: '16:9 (Landscape)' },
+                    { value: '9:16', label: '9:16 (Portrait)' },
+                    { value: '4:3', label: '4:3' },
+                    { value: '3:2', label: '3:2' }
+                ];
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    if (opt.value === '1:1') option.selected = true;
+                    aspectRatioSelect.appendChild(option);
+                });
+            } else if (model === 'nano-banana-pro-edit') {
+                // Nano Banana Pro Edit supports: auto, 21:9, 16:9, 3:2, 4:3, 5:4, 1:1, 4:5, 3:4, 2:3, 9:16
+                const options = [
+                    { value: 'auto', label: 'Auto (Keep Original)', selected: true },
+                    { value: '21:9', label: '21:9 (Ultra Wide)' },
+                    { value: '16:9', label: '16:9 (Landscape)' },
+                    { value: '3:2', label: '3:2' },
+                    { value: '4:3', label: '4:3' },
+                    { value: '5:4', label: '5:4' },
+                    { value: '1:1', label: '1:1 (Square)' },
+                    { value: '4:5', label: '4:5' },
+                    { value: '3:4', label: '3:4' },
+                    { value: '2:3', label: '2:3' },
+                    { value: '9:16', label: '9:16 (Portrait)' }
+                ];
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    if (opt.selected) option.selected = true;
+                    aspectRatioSelect.appendChild(option);
+                });
+            } else {
+                // Default aspect ratios for other models
+                const options = [
+                    { value: '16:9', label: '16:9 (Landscape)' },
+                    { value: '1:1', label: '1:1 (Square)', selected: true },
+                    { value: '9:16', label: '9:16 (Portrait)' },
+                    { value: '4:3', label: '4:3' },
+                    { value: '3:2', label: '3:2' },
+                    { value: '2:3', label: '2:3' },
+                    { value: '3:4', label: '3:4' }
+                ];
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    if (opt.selected) option.selected = true;
+                    aspectRatioSelect.appendChild(option);
+                });
+            }
+
+            resolutionGroup.classList.add('hidden');
+            safetyGroup.classList.add('hidden');
+            editGroup.classList.add('hidden');
+
+            // Show resolution for models that support it
+            if (model === 'nano-banana-pro' || model === 'imagen4-preview' || model === 'nano-banana-pro-edit') {
+                resolutionGroup.classList.remove('hidden');
+            }
+
+            // Show safety tolerance for FLUX models
+            if (model === 'flux-1.1-pro-ultra' || model === 'flux-2-pro' || model === 'flux-2-pro-edit') {
+                safetyGroup.classList.remove('hidden');
+            }
+
+            // Show image URL input for image-to-image models
+            if (model === 'flux-2-pro-edit' || model === 'nano-banana-pro-edit') {
+                editGroup.classList.remove('hidden');
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+
+            const btn = document.querySelector(`button[onclick="switchTab('${tabName}')"]`);
+            const view = document.getElementById(`${tabName}-view`);
+
+            if (btn) btn.classList.add('active');
+            if (view) view.classList.add('active');
+
+            if (tabName === 'gallery') {
+                loadGallery();
+            } else if (tabName === 'collection') {
+                loadCollection();
+            }
+        }
+
+        // Generate Image
+        generateBtn.addEventListener('click', async () => {
+            const model = document.getElementById('model').value;
+            const aspectRatio = document.getElementById('aspect_ratio').value;
+            const prompt = document.getElementById('prompt').value.trim();
+            const resolution = document.getElementById('resolution').value;
+            const safety_tolerance = document.getElementById('safety_tolerance').value;
+            const image_url = document.getElementById('image_url').value.trim();
+
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            // Check if image URL is required for image-to-image models
+            const editModels = ['flux-2-pro-edit', 'nano-banana-pro-edit'];
+            if (editModels.includes(model) && !image_url) {
+                alert('Please enter a source image URL for image editing');
+                return;
+            }
+
+            generateBtn.disabled = true;
+            loading.classList.add('active');
+
+            const emptyState = document.getElementById('empty-state');
+            if (emptyState) emptyState.style.display = 'none';
+
+            const prevCard = currentResult.querySelector('.result-card');
+            if (prevCard) prevCard.remove();
+
+            try {
+                const payload = { model, prompt, aspectRatio };
+
+                // Add resolution for models that support it
+                if (model === 'nano-banana-pro' || model === 'imagen4-preview' || model === 'nano-banana-pro-edit') {
+                    payload.resolution = resolution;
+                }
+
+                // Add safety tolerance for FLUX models
+                if (model === 'flux-1.1-pro-ultra' || model === 'flux-2-pro' || model === 'flux-2-pro-edit') {
+                    payload.safety_tolerance = safety_tolerance;
+                }
+
+                // Add image URL for image-to-image models
+                if (image_url) {
+                    payload.image_url = image_url;
+                }
+
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Generation failed');
+                }
+
+                const data = await response.json();
+                renderCard(data, currentResult, false);
+
+            } catch (error) {
+                console.error(error);
+                alert('Error: ' + error.message);
+                if (emptyState) emptyState.style.display = 'flex';
+            } finally {
+                generateBtn.disabled = false;
+                loading.classList.remove('active');
+            }
+        });
+
+        // Add Manual Image
+        addManualBtn.addEventListener('click', async () => {
+            const url = document.getElementById('manual-url').value.trim();
+            const prompt = document.getElementById('manual-prompt').value.trim();
+            const model = document.getElementById('manual-model').value.trim();
+            const aspectRatio = document.getElementById('manual-aspect').value;
+
+            if (!url || !prompt) {
+                alert('Please enter both image URL and prompt');
+                return;
+            }
+
+            addManualBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/images/manual', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, prompt, model, aspectRatio })
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to add image');
+                }
+
+                const data = await response.json();
+
+                // Clear form
+                document.getElementById('manual-url').value = '';
+                document.getElementById('manual-prompt').value = '';
+                document.getElementById('manual-model').value = '';
+                document.getElementById('manual-aspect').value = '';
+
+                // Reload collection
+                loadCollection();
+                alert('Image added successfully!');
+
+            } catch (error) {
+                console.error(error);
+                alert('Error: ' + error.message);
+            } finally {
+                addManualBtn.disabled = false;
+            }
+        });
+
+        async function loadGallery() {
+            galleryView.innerHTML = '<div class="loading active"><div class="spinner"></div><p>Loading gallery...</p></div>';
+            try {
+                const response = await fetch('/api/images');
+                if (response.status === 401) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                const images = await response.json();
+                galleryView.innerHTML = '';
+
+                if (images.length === 0) {
+                    galleryView.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: var(--text-secondary);">No images generated yet.</p>';
+                    return;
+                }
+
+                // Filter auto-generated images
+                const autoImages = images.filter(img => img.source !== 'manual');
+                autoImages.forEach(img => renderCard(img, galleryView, true));
+            } catch (error) {
+                console.error(error);
+                galleryView.innerHTML = '<p style="color: var(--danger-color);">Failed to load gallery.</p>';
+            }
+        }
+
+        async function loadCollection() {
+            collectionGallery.innerHTML = '<div class="loading active"><div class="spinner"></div><p>Loading collection...</p></div>';
+            try {
+                const response = await fetch('/api/images');
+                if (response.status === 401) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                const images = await response.json();
+                collectionGallery.innerHTML = '';
+
+                // Filter manual images
+                const manualImages = images.filter(img => img.source === 'manual');
+
+                if (manualImages.length === 0) {
+                    collectionGallery.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: var(--text-secondary);">No manual collection yet.</p>';
+                    return;
+                }
+
+                manualImages.forEach(img => renderCard(img, collectionGallery, true));
+            } catch (error) {
+                console.error(error);
+                collectionGallery.innerHTML = '<p style="color: var(--danger-color);">Failed to load collection.</p>';
+            }
+        }
+
+        function renderCard(data, container, isGallery) {
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            card.id = `card-${data.id}`;
+
+            // Prefer Lsky URL, fallback to original URL
+            const displayUrl = data.lskyUrl || data.url;
+            const safePrompt = data.prompt.replace(/"/g, '&quot;');
+
+            let deleteBtn = '';
+            if (isGallery) {
+                deleteBtn = `<button class="action-btn danger" onclick="deleteImage('${data.id}')">Delete</button>`;
+            }
+
+            // Format date and time
+            const dateObj = new Date(data.timestamp);
+            const dateStr = dateObj.toLocaleDateString('zh-CN');
+            const timeStr = dateObj.toLocaleTimeString('zh-CN');
+
+            card.innerHTML = `
+                <div class="image-container">
+                    <img src="${displayUrl}" alt="Generated Image" loading="lazy">
+                </div>
+                <div class="image-details">
+                    <div class="meta-info">
+                        <span class="meta-tag">${data.model}</span>
+                        <span class="meta-tag">${data.aspectRatio}</span>
+                        ${data.resolution ? `<span class="meta-tag">${data.resolution}</span>` : ''}
+                        <span class="meta-tag">${dateStr} ${timeStr}</span>
+                    </div>
+                    <p class="prompt-text">${data.prompt}</p>
+                    <div class="actions">
+                        <button class="action-btn" onclick="copyPrompt(this)">Copy Prompt</button>
+                        <a href="${displayUrl}" target="_blank" class="action-btn">Open</a>
+                        ${deleteBtn}
+                    </div>
+                </div>
+                <input type="hidden" class="prompt-value" value="${safePrompt}">
+            `;
+
+            if (container === currentResult) {
+                container.insertBefore(card, loading.nextSibling);
+            } else {
+                container.appendChild(card);
+            }
+        }
+
+        function copyPrompt(btn) {
+            const card = btn.closest('.result-card');
+            const promptInput = card.querySelector('.prompt-value');
+            const text = promptInput.value;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = originalText, 2000);
+            });
+        }
+
+        async function deleteImage(id) {
+            if (!confirm('Are you sure you want to delete this image?')) return;
+
+            try {
+                const response = await fetch(`/api/images/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    const card = document.getElementById(`card-${id}`);
+                    if (card) card.remove();
+                } else {
+                    alert('Failed to delete image');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error deleting image');
+            }
+        }
+    </script>
+</body>
+
+</html>
