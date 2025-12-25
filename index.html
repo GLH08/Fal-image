@@ -862,23 +862,42 @@
                     payload.image_url = image_url;
                 }
 
-                const response = await fetch('/api/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                // 设置 10 分钟超时
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 600000);
 
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        window.location.href = '/login.html';
-                        return;
+                try {
+                    const response = await fetch('/api/generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            window.location.href = '/login.html';
+                            return;
+                        }
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Generation failed');
                     }
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Generation failed');
-                }
 
-                const data = await response.json();
-                renderCard(data, currentResult, false);
+                    const data = await response.json();
+                    renderCard(data, currentResult, false);
+                } catch (fetchError) {
+                    clearTimeout(timeoutId);
+                    // 如果是网络超时或连接断开，检查 Gallery 是否有新图片
+                    if (fetchError.name === 'AbortError' || fetchError.message.includes('<!DOCTYPE') || fetchError.message.includes('Failed to fetch')) {
+                        console.log('Request may have timed out, checking gallery...');
+                        await new Promise(r => setTimeout(r, 3000));
+                        await loadGallery();
+                        alert('请求可能超时，但图片可能已生成成功，请检查 Gallery');
+                    } else {
+                        throw fetchError;
+                    }
+                }
 
             } catch (error) {
                 console.error(error);
