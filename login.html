@@ -7,38 +7,31 @@
     <title>Login - Fal.ai Generator</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg height='1em' viewBox='0 0 24 24' width='1em' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath clip-rule='evenodd' d='M15.477 0c.415 0 .749.338.788.752a7.775 7.775 0 006.985 6.984c.413.04.752.373.752.788v6.952c0 .415-.338.748-.752.788a7.775 7.775 0 00-6.985 6.984c-.04.414-.373.752-.788.752H8.525c-.416 0-.749-.338-.789-.752a7.775 7.775 0 00-6.984-6.984c-.414-.04-.752-.373-.752-.788V8.524c0-.415.338-.748.752-.788A7.775 7.775 0 007.736.752C7.776.338 8.11 0 8.526 0h6.95zM4.819 11.98a7.226 7.226 0 007.223 7.23 7.226 7.226 0 007.223-7.23c0-3.994-3.234-7.23-7.223-7.23a7.227 7.227 0 00-7.223 7.23z' fill='%23EC0648' fill-rule='evenodd'/%3E%3C/svg%3E">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         :root {
-            --bg-base: #f2f2f7;
+            --bg-gradient: linear-gradient(180deg, #e8eaef 0%, #f2f2f7 50%, #fafafa 100%);
             --glass-bg: rgba(255, 255, 255, 0.72);
-            --glass-border: rgba(0, 0, 0, 0.06);
+            --glass-border: rgba(0, 0, 0, 0.08);
             --text-primary: rgba(0, 0, 0, 0.88);
             --text-secondary: rgba(0, 0, 0, 0.55);
-            --text-tertiary: rgba(0, 0, 0, 0.35);
-            --accent-primary: #EC0648;
-            --accent-glow: rgba(236, 6, 72, 0.25);
-            --accent-gradient: linear-gradient(135deg, #EC0648 0%, #ff3366 50%, #ff6b8a 100%);
-            --danger: #ff3b30;
+            --accent-color: #EC0648;
+            --accent-hover: #d10540;
+            --danger-color: #ff3b30;
             --input-bg: rgba(0, 0, 0, 0.04);
-            --input-border: rgba(0, 0, 0, 0.08);
-            --input-focus-border: rgba(236, 6, 72, 0.5);
-            --input-focus-glow: 0 0 0 4px rgba(236, 6, 72, 0.12);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-base);
-            background-image: linear-gradient(180deg, #e8eaef 0%, #f2f2f7 50%, #fafafa 100%);
-            background-attachment: fixed;
+            background: #f2f2f7;
+            background-image: var(--bg-gradient);
             color: var(--text-primary);
-            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 1.5rem;
+            min-height: 100vh;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -56,7 +49,7 @@
         body::before {
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(236, 6, 72, 0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(236, 6, 72, 0.12) 0%, transparent 70%);
             top: -100px;
             right: -100px;
         }
@@ -64,7 +57,7 @@
         body::after {
             width: 350px;
             height: 350px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
             bottom: -80px;
             left: -80px;
             animation-delay: -10s;
@@ -72,7 +65,7 @@
 
         @keyframes float {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(-30px, 30px) scale(1.1); }
+            50% { transform: translate(-30px, 30px) scale(1.05); }
         }
 
         .login-card {
@@ -81,13 +74,13 @@
             border-radius: 24px;
             border: 1px solid var(--glass-border);
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
             backdrop-filter: blur(40px);
             -webkit-backdrop-filter: blur(40px);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08),
-                       0 2px 8px rgba(0, 0, 0, 0.04),
                        inset 0 1px 0 rgba(255, 255, 255, 0.8);
             text-align: center;
+            margin: 1rem;
         }
 
         .logo {
@@ -100,72 +93,70 @@
 
         h1 {
             font-size: 1.5rem;
-            font-weight: 600;
-            background: var(--accent-gradient);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #EC0648, #ff3366);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 0.5rem;
+            font-weight: 700;
         }
 
         .subtitle {
-            font-size: 0.875rem;
-            color: var(--text-tertiary);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
             margin-bottom: 2rem;
         }
 
         input {
             width: 100%;
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            border: 1px solid var(--glass-border);
             color: var(--text-primary);
-            padding: 0.875rem 1rem;
+            padding: 1rem;
             border-radius: 12px;
-            font-size: 0.9375rem;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.2s;
             font-family: inherit;
-            margin-bottom: 1rem;
-            transition: all 0.2s ease;
         }
 
         input:focus {
-            outline: none;
-            border-color: var(--input-focus-border);
-            box-shadow: var(--input-focus-glow);
-            background: rgba(255, 255, 255, 0.8);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(236, 6, 72, 0.1);
+            background: rgba(255, 255, 255, 0.9);
         }
 
-        input::placeholder { color: var(--text-tertiary); }
+        input::placeholder { color: var(--text-secondary); }
 
         button {
             width: 100%;
-            background: var(--accent-gradient);
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
             color: white;
             border: none;
-            padding: 0.875rem 1.5rem;
+            padding: 1rem;
             border-radius: 12px;
             font-weight: 600;
-            font-size: 0.9375rem;
             cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 12px var(--accent-glow);
+            font-size: 1rem;
+            transition: all 0.25s;
+            box-shadow: 0 4px 16px rgba(236, 6, 72, 0.25);
         }
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--accent-glow);
+            box-shadow: 0 8px 24px rgba(236, 6, 72, 0.35);
         }
 
-        button:active { transform: translateY(0); }
-
         .error {
-            color: var(--danger);
+            color: var(--danger-color);
             margin-top: 1rem;
-            font-size: 0.8125rem;
+            font-size: 0.9rem;
             display: none;
             padding: 0.75rem;
             background: rgba(255, 59, 48, 0.08);
             border-radius: 8px;
-            border: 1px solid rgba(255, 59, 48, 0.15);
         }
     </style>
 </head>
@@ -215,4 +206,5 @@
         });
     </script>
 </body>
+
 </html>
