@@ -376,10 +376,12 @@ function constructFalPayload(model, params) {
 
     // Add model-specific parameters
     if (config.type === 'image-to-image') {
-        if (params.image_url) {
-            payload.image_url = params.image_url;
-        } else if (params.imageUrls && params.imageUrls.length > 0) {
+        // Both FLUX 2 Pro Edit and nano-banana-pro/edit require image_urls (array format)
+        if (params.imageUrls && params.imageUrls.length > 0) {
             payload.image_urls = params.imageUrls;
+        } else if (params.image_url) {
+            // Convert single image_url to image_urls array format
+            payload.image_urls = [params.image_url];
         }
 
         // FLUX 2 Pro Edit uses image_size
