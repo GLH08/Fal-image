@@ -115,6 +115,33 @@ Content-Type: application/json
 }
 ```
 
+### 视频收集接口
+
+```bash
+# 添加文生视频
+POST /api/videos/text-to-video
+Content-Type: application/json
+
+{
+  "url": "https://example.com/video.mp4",
+  "prompt": "A cat walking in the garden",
+  "model": "Runway Gen-3",
+  "aspectRatio": "16:9"
+}
+
+# 添加图生视频
+POST /api/videos/image-to-video
+Content-Type: application/json
+
+{
+  "url": "https://example.com/video.mp4",
+  "sourceImageUrl": "https://example.com/source.jpg",
+  "prompt": "Make the cat walk",
+  "model": "Kling",
+  "aspectRatio": "16:9"
+}
+```
+
 ### 其他接口
 
 - `GET /health` - 健康检查
@@ -124,6 +151,12 @@ Content-Type: application/json
 - `POST /api/images/manual` - 手动添加图像
 - `DELETE /api/images/:id` - 删除图像
 - `PATCH /api/images/:id/hide` - 隐藏图像
+- `GET /api/videos` - 获取视频列表
+- `GET /api/videos/stats` - 获取视频统计
+- `POST /api/videos/text-to-video` - 添加文生视频
+- `POST /api/videos/image-to-video` - 添加图生视频
+- `DELETE /api/videos/:id` - 删除视频
+- `PATCH /api/videos/:id/hide` - 隐藏视频
 
 ## 项目结构
 
@@ -172,12 +205,13 @@ docker-compose up -d --build  # 重新构建
 
 - 🎨 多模型支持（FLUX、Imagen、Gemini）
 - 🖼️ 文生图 & 图生图
-- 📐 多种宽高比和分辨率
-- 🔒 可选密码保护
-- 📊 使用统计
+- 🎬 视频收集管理（文生视频 & 图生视频）
+- � 多种密宽高比和分辨率
+- � 可选统密码保护
+- � 使用统管计
 - 🖼️ 图库管理
 - ☁️ Lsky Pro 图床集成
-- 🛡️ 速率限制和安全防护
+- �️D 速率限制和安全防护
 - 🐳 Docker 一键部署
 
 ## Nginx 反向代理配置

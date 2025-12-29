@@ -143,7 +143,8 @@
         }
 
         #generator-view,
-        #collection-view {
+        #collection-view,
+        #video-view {
             grid-template-columns: 380px 1fr;
             gap: 2.5rem;
             align-items: start;
@@ -153,7 +154,8 @@
         @media (max-width: 900px) {
 
             #generator-view,
-            #collection-view {
+            #collection-view,
+            #video-view {
                 grid-template-columns: 1fr;
             }
 
@@ -264,7 +266,8 @@
         }
 
         #gallery-view,
-        #collection-gallery {
+        #collection-gallery,
+        #video-gallery {
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 2rem;
         }
@@ -479,6 +482,68 @@
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 0, 0, 0.2);
         }
+
+        /* Video Card Styles */
+        .video-container {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.03);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .video-type-badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        .source-image-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--glass-border);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .source-image-preview:hover {
+            transform: scale(1.1);
+        }
+
+        .source-image-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
+        }
+
+        .source-image-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
     </style>
 </head>
 
@@ -488,6 +553,7 @@
             <button class="tab-btn active" onclick="switchTab('generator')">Generator</button>
             <button class="tab-btn" onclick="switchTab('gallery')">Gallery</button>
             <button class="tab-btn" onclick="switchTab('collection')">Collection</button>
+            <button class="tab-btn" onclick="switchTab('video')">Video</button>
         </div>
 
         <!-- Generator View -->
@@ -618,17 +684,85 @@
                 <!-- Manual collection items will be loaded here -->
             </div>
         </div>
+
+        <!-- Video Collection View -->
+        <div id="video-view" class="view">
+            <div class="controls">
+                <h1>Video Collection</h1>
+
+                <div class="form-group">
+                    <label for="video-type">Video Type</label>
+                    <select id="video-type" onchange="updateVideoForm()">
+                        <option value="text-to-video">Text to Video (文生视频)</option>
+                        <option value="image-to-video">Image to Video (图生视频)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="video-url">Video URL</label>
+                    <input type="text" id="video-url" placeholder="https://example.com/video.mp4">
+                </div>
+
+                <div class="form-group hidden" id="video-source-image-group">
+                    <label for="video-source-image">Source Image URL</label>
+                    <input type="text" id="video-source-image" placeholder="https://example.com/source-image.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="video-prompt">Prompt</label>
+                    <textarea id="video-prompt" placeholder="Enter the prompt used to generate this video..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="video-model">Model</label>
+                    <input type="text" id="video-model" placeholder="e.g., Runway, Pika, Kling, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label for="video-aspect">Aspect Ratio</label>
+                    <select id="video-aspect">
+                        <option value="">Select...</option>
+                        <option value="16:9">16:9</option>
+                        <option value="9:16">9:16</option>
+                        <option value="1:1">1:1</option>
+                        <option value="4:3">4:3</option>
+                        <option value="3:4">3:4</option>
+                        <option value="21:9">21:9</option>
+                    </select>
+                </div>
+
+                <button id="addVideoBtn" class="generate-btn">Add to Collection</button>
+            </div>
+
+            <div id="video-gallery" style="display: grid; margin-top: 0;">
+                <!-- Video collection items will be loaded here -->
+            </div>
+        </div>
     </div>
 
     <script>
         const generateBtn = document.getElementById('generateBtn');
         const addManualBtn = document.getElementById('addManualBtn');
+        const addVideoBtn = document.getElementById('addVideoBtn');
         const currentResult = document.getElementById('current-result');
         const loading = document.getElementById('loading');
         const galleryView = document.getElementById('gallery-view');
         const collectionGallery = document.getElementById('collection-gallery');
+        const videoGallery = document.getElementById('video-gallery');
 
         updateControls();
+
+        // Video form toggle
+        function updateVideoForm() {
+            const videoType = document.getElementById('video-type').value;
+            const sourceImageGroup = document.getElementById('video-source-image-group');
+            
+            if (videoType === 'image-to-video') {
+                sourceImageGroup.classList.remove('hidden');
+            } else {
+                sourceImageGroup.classList.add('hidden');
+            }
+        }
 
         function updateControls() {
             const model = document.getElementById('model').value;
@@ -811,6 +945,8 @@
                 loadGallery();
             } else if (tabName === 'collection') {
                 loadCollection();
+            } else if (tabName === 'video') {
+                loadVideos();
             }
         }
 
@@ -959,6 +1095,75 @@
             }
         });
 
+        // Add Video
+        addVideoBtn.addEventListener('click', async () => {
+            const videoType = document.getElementById('video-type').value;
+            const url = document.getElementById('video-url').value.trim();
+            const sourceImageUrl = document.getElementById('video-source-image').value.trim();
+            const prompt = document.getElementById('video-prompt').value.trim();
+            const model = document.getElementById('video-model').value.trim();
+            const aspectRatio = document.getElementById('video-aspect').value;
+
+            if (!url) {
+                alert('Please enter video URL');
+                return;
+            }
+
+            if (videoType === 'text-to-video' && !prompt) {
+                alert('Please enter prompt for text-to-video');
+                return;
+            }
+
+            if (videoType === 'image-to-video' && !sourceImageUrl) {
+                alert('Please enter source image URL for image-to-video');
+                return;
+            }
+
+            addVideoBtn.disabled = true;
+
+            try {
+                const endpoint = videoType === 'text-to-video' 
+                    ? '/api/videos/text-to-video' 
+                    : '/api/videos/image-to-video';
+
+                const payload = videoType === 'text-to-video'
+                    ? { url, prompt, model, aspectRatio }
+                    : { url, sourceImageUrl, prompt, model, aspectRatio };
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to add video');
+                }
+
+                // Clear form
+                document.getElementById('video-url').value = '';
+                document.getElementById('video-source-image').value = '';
+                document.getElementById('video-prompt').value = '';
+                document.getElementById('video-model').value = '';
+                document.getElementById('video-aspect').value = '';
+
+                // Reload videos
+                loadVideos();
+                alert('Video added successfully!');
+
+            } catch (error) {
+                console.error(error);
+                alert('Error: ' + error.message);
+            } finally {
+                addVideoBtn.disabled = false;
+            }
+        });
+
         async function loadGallery() {
             galleryView.innerHTML = '<div class="loading active"><div class="spinner"></div><p>Loading gallery...</p></div>';
             try {
@@ -1007,6 +1212,110 @@
             } catch (error) {
                 console.error(error);
                 collectionGallery.innerHTML = '<p style="color: var(--danger-color);">Failed to load collection.</p>';
+            }
+        }
+
+        async function loadVideos() {
+            videoGallery.innerHTML = '<div class="loading active"><div class="spinner"></div><p>Loading videos...</p></div>';
+            try {
+                const response = await fetch('/api/videos');
+                if (response.status === 401) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                const videos = await response.json();
+                videoGallery.innerHTML = '';
+
+                if (videos.length === 0) {
+                    videoGallery.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: var(--text-secondary);">No videos collected yet.</p>';
+                    return;
+                }
+
+                videos.forEach(video => renderVideoCard(video, videoGallery));
+            } catch (error) {
+                console.error(error);
+                videoGallery.innerHTML = '<p style="color: var(--danger-color);">Failed to load videos.</p>';
+            }
+        }
+
+        function renderVideoCard(data, container) {
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            card.id = `card-${data.id}`;
+
+            const safePrompt = (data.prompt || '').replace(/"/g, '&quot;');
+            const typeLabel = data.type === 'text-to-video' ? 'T2V' : 'I2V';
+            const typeFull = data.type === 'text-to-video' ? '文生视频' : '图生视频';
+
+            // Format date and time
+            const dateObj = new Date(data.timestamp);
+            const dateStr = dateObj.toLocaleDateString('zh-CN');
+            const timeStr = dateObj.toLocaleTimeString('zh-CN');
+
+            let sourceImageHtml = '';
+            if (data.type === 'image-to-video' && data.sourceImageUrl) {
+                sourceImageHtml = `
+                    <div class="source-image-row">
+                        <span class="source-image-label">Source:</span>
+                        <img src="${data.sourceImageUrl}" alt="Source Image" class="source-image-preview" onclick="window.open('${data.sourceImageUrl}', '_blank')">
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="video-container">
+                    <span class="video-type-badge">${typeLabel} ${typeFull}</span>
+                    <video controls preload="metadata">
+                        <source src="${data.url}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="image-details">
+                    <div class="meta-info">
+                        <span class="meta-tag">${data.model}</span>
+                        <span class="meta-tag">${data.aspectRatio}</span>
+                        <span class="meta-tag">${dateStr} ${timeStr}</span>
+                    </div>
+                    ${sourceImageHtml}
+                    ${data.prompt ? `<p class="prompt-text">${data.prompt}</p>` : ''}
+                    <div class="actions">
+                        ${data.prompt ? `<button class="action-btn" onclick="copyVideoPrompt(this)">Copy Prompt</button>` : ''}
+                        <a href="${data.url}" target="_blank" class="action-btn">Open</a>
+                        <button class="action-btn danger" onclick="deleteVideo('${data.id}')">Delete</button>
+                    </div>
+                </div>
+                <input type="hidden" class="prompt-value" value="${safePrompt}">
+            `;
+
+            container.appendChild(card);
+        }
+
+        function copyVideoPrompt(btn) {
+            const card = btn.closest('.result-card');
+            const promptInput = card.querySelector('.prompt-value');
+            const text = promptInput.value;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = originalText, 2000);
+            });
+        }
+
+        async function deleteVideo(id) {
+            if (!confirm('Are you sure you want to delete this video?')) return;
+
+            try {
+                const response = await fetch(`/api/videos/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    const card = document.getElementById(`card-${id}`);
+                    if (card) card.remove();
+                } else {
+                    alert('Failed to delete video');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error deleting video');
             }
         }
 

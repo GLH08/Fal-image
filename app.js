@@ -263,12 +263,17 @@ const FAL_MODEL_CONFIG = {
 // Database Helpers
 function readDb() {
     if (!fs.existsSync(DB_FILE)) {
-        return { images: [], statistics: { total: 0, byModel: {} } };
+        return { images: [], videos: [], statistics: { total: 0, byModel: {}, videoTotal: 0, videoByModel: {} } };
     }
     try {
-        return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+        const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+        // Ensure videos array exists for backward compatibility
+        if (!data.videos) data.videos = [];
+        if (!data.statistics.videoTotal) data.statistics.videoTotal = 0;
+        if (!data.statistics.videoByModel) data.statistics.videoByModel = {};
+        return data;
     } catch (e) {
-        return { images: [], statistics: { total: 0, byModel: {} } };
+        return { images: [], videos: [], statistics: { total: 0, byModel: {}, videoTotal: 0, videoByModel: {} } };
     }
 }
 
@@ -834,6 +839,147 @@ app.patch('/api/images/:id/hide', (req, res) => {
     writeDb(db);
     res.json({ success: true });
 });
+
+// ==================== Video Collection Endpoints ====================
+
+// Helper function to add video to database
+function addVideoToDb(video) {
+    try {
+        const db = readDb();
+        if (!db.videos) db.videos = [];
+        if (!db.statistics.videoTotal) db.statistics.videoTotal = 0;
+        if (!db.statistics.videoByModel) db.statistics.videoByModel = {};
+
+        db.videos.unshift(video);
+        db.statistics.videoTotal = (db.statistics.videoTotal || 0) + 1;
+        db.statistics.videoByModel[video.model] = (db.statistics.videoByModel[video.model] || 0) + 1;
+        writeDb(db);
+        console.log(`✅ Video saved to database: ${video.model} (Total: ${db.statistics.videoTotal})`);
+    } catch (error) {
+        console.error('❌ Failed to save video to database:', error);
+    }
+}
+
+// Get all videos
+app.get('/api/videos', (req, res) => {
+    const db = readDb();
+    const visibleVideos = (db.videos || []).filter(v => !v.hidden);
+    res.json(visibleVideos);
+});
+
+// Get video statistics
+app.get('/api/videos/stats', (req, res) => {
+    const db = readDb();
+    res.json({
+        videoTotal: db.statistics.videoTotal || 0,
+        videoByModel: db.statistics.videoByModel || {}
+    });
+});
+
+// Add text-to-video (文生视频)
+app.post('/api/videos/text-to-video', (req, res) => {
+    const { url, prompt, model, aspectRatio } = req.body;
+
+    if (!url || !prompt) {
+        return res.status(400).json({ error: "Video URL and prompt are required." });
+    }
+
+    try {
+        new URL(url);
+    } catch (e) {
+        return res.status(400).json({ error: "Invalid video URL format." });
+    }
+
+    const id = 'video-t2v-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+
+    const videoRecord = {
+        id: id,
+        url: url,
+        prompt: prompt,
+        model: model || 'Unknown',
+        aspectRatio: aspectRatio || 'Unknown',
+        type: 'text-to-video',
+        timestamp: new Date().toISOString(),
+        hidden: false,
+        source: 'manual'
+    };
+
+    addVideoToDb(videoRecord);
+    res.json(videoRecord);
+});
+
+// Add image-to-video (图生视频)
+app.post('/api/videos/image-to-video', (req, res) => {
+    const { url, sourceImageUrl, prompt, model, aspectRatio } = req.body;
+
+    if (!url || !sourceImageUrl) {
+        return res.status(400).json({ error: "Video URL and source image URL are required." });
+    }
+
+    try {
+        new URL(url);
+    } catch (e) {
+        return res.status(400).json({ error: "Invalid video URL format." });
+    }
+
+    try {
+        new URL(sourceImageUrl);
+    } catch (e) {
+        return res.status(400).json({ error: "Invalid source image URL format." });
+    }
+
+    const id = 'video-i2v-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+
+    const videoRecord = {
+        id: id,
+        url: url,
+        sourceImageUrl: sourceImageUrl,
+        prompt: prompt || '',
+        model: model || 'Unknown',
+        aspectRatio: aspectRatio || 'Unknown',
+        type: 'image-to-video',
+        timestamp: new Date().toISOString(),
+        hidden: false,
+        source: 'manual'
+    };
+
+    addVideoToDb(videoRecord);
+    res.json(videoRecord);
+});
+
+// Delete video
+app.delete('/api/videos/:id', (req, res) => {
+    const { id } = req.params;
+    const db = readDb();
+    if (!db.videos) {
+        return res.status(404).json({ error: "Video not found" });
+    }
+    const initialLength = db.videos.length;
+    db.videos = db.videos.filter(v => v.id !== id);
+    if (db.videos.length === initialLength) {
+        return res.status(404).json({ error: "Video not found" });
+    }
+    writeDb(db);
+    res.json({ success: true });
+});
+
+// Hide video
+app.patch('/api/videos/:id/hide', (req, res) => {
+    const { id } = req.params;
+    const db = readDb();
+    if (!db.videos) {
+        return res.status(404).json({ error: "Video not found" });
+    }
+    const video = db.videos.find(v => v.id === id);
+    if (!video) {
+        return res.status(404).json({ error: "Video not found" });
+    }
+    video.hidden = true;
+    writeDb(db);
+    res.json({ success: true });
+});
+
+// ==================== End Video Collection Endpoints ====================
 
 // Image Upload Endpoint for Editing
 app.post('/api/upload', async (req, res) => {
