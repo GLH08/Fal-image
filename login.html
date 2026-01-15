@@ -1,210 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Fal.ai Generator</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg height='1em' viewBox='0 0 24 24' width='1em' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath clip-rule='evenodd' d='M15.477 0c.415 0 .749.338.788.752a7.775 7.775 0 006.985 6.984c.413.04.752.373.752.788v6.952c0 .415-.338.748-.752.788a7.775 7.775 0 00-6.985 6.984c-.04.414-.373.752-.788.752H8.525c-.416 0-.749-.338-.789-.752a7.775 7.775 0 00-6.984-6.984c-.414-.04-.752-.373-.752-.788V8.524c0-.415.338-.748.752-.788A7.775 7.775 0 007.736.752C7.776.338 8.11 0 8.526 0h6.95zM4.819 11.98a7.226 7.226 0 007.223 7.23 7.226 7.226 0 007.223-7.23c0-3.994-3.234-7.23-7.223-7.23a7.227 7.227 0 00-7.223 7.23z' fill='%23EC0648' fill-rule='evenodd'/%3E%3C/svg%3E">
+    <title>Login - Fal.ai Studio</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15.477 0c.415 0 .749.338.788.752a7.775 7.775 0 006.985 6.984c.413.04.752.373.752.788v6.952c0 .415-.338.748-.752.788a7.775 7.775 0 00-6.985 6.984c-.04.414-.373.752-.788.752H8.525c-.416 0-.749-.338-.789-.752a7.775 7.775 0 00-6.984-6.984c-.414-.04-.752-.373-.752-.788V8.524c0-.415.338-.748.752-.788A7.775 7.775 0 007.736.752C7.776.338 8.11 0 8.526 0h6.95z' fill='%238B5CF6'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        aurora: { purple: '#8B5CF6', pink: '#EC4899', cyan: '#06B6D4' },
+                        dark: { 900: '#09090b', 800: '#18181b', 700: '#27272a' }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-        :root {
-            --bg-gradient: linear-gradient(180deg, #e8eaef 0%, #f2f2f7 50%, #fafafa 100%);
-            --glass-bg: rgba(255, 255, 255, 0.72);
-            --glass-border: rgba(0, 0, 0, 0.08);
-            --text-primary: rgba(0, 0, 0, 0.88);
-            --text-secondary: rgba(0, 0, 0, 0.55);
-            --accent-color: #EC0648;
-            --accent-hover: #d10540;
-            --danger-color: #ff3b30;
-            --input-bg: rgba(0, 0, 0, 0.04);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f2f2f7;
-            background-image: var(--bg-gradient);
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body::before, body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.5;
-            pointer-events: none;
-            z-index: -1;
-            animation: float 20s ease-in-out infinite;
-        }
-
-        body::before {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(236, 6, 72, 0.12) 0%, transparent 70%);
-            top: -100px;
-            right: -100px;
-        }
-
-        body::after {
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-            bottom: -80px;
-            left: -80px;
-            animation-delay: -10s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(-30px, 30px) scale(1.05); }
-        }
-
-        .login-card {
-            background: var(--glass-bg);
-            padding: 2.5rem;
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
-            width: 100%;
-            max-width: 400px;
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08),
-                       inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            text-align: center;
-            margin: 1rem;
-        }
-
-        .logo {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 1.5rem;
-        }
-
-        .logo svg { width: 100%; height: 100%; }
-
-        h1 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #EC0648, #ff3366);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-        }
-
-        .subtitle {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-        }
-
-        input {
-            width: 100%;
-            background-color: var(--input-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 1rem;
-            border-radius: 12px;
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
-            box-sizing: border-box;
-            outline: none;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-
-        input:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 4px rgba(236, 6, 72, 0.1);
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        input::placeholder { color: var(--text-secondary); }
-
-        button {
-            width: 100%;
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-            color: white;
-            border: none;
-            padding: 1rem;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.25s;
-            box-shadow: 0 4px 16px rgba(236, 6, 72, 0.25);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(236, 6, 72, 0.35);
-        }
-
-        .error {
-            color: var(--danger-color);
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            display: none;
-            padding: 0.75rem;
-            background: rgba(255, 59, 48, 0.08);
-            border-radius: 8px;
-        }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
+        .animate-float { animation: float 8s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .animate-float { animation: none; } }
     </style>
 </head>
+<body class="font-sans bg-dark-900 text-zinc-100 min-h-screen flex items-center justify-center p-4 overflow-hidden">
+    <!-- Aurora Background -->
+    <div class="fixed inset-0 -z-10">
+        <div class="absolute -top-1/2 -left-1/4 w-[800px] h-[800px] bg-aurora-purple/20 rounded-full blur-[120px] animate-pulse"></div>
+        <div class="absolute -bottom-1/4 -right-1/4 w-[600px] h-[600px] bg-aurora-pink/15 rounded-full blur-[100px]"></div>
+        <div class="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-aurora-cyan/10 rounded-full blur-[80px]"></div>
+    </div>
 
-<body>
-    <div class="login-card">
-        <div class="logo">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path clip-rule="evenodd" d="M15.477 0c.415 0 .749.338.788.752a7.775 7.775 0 006.985 6.984c.413.04.752.373.752.788v6.952c0 .415-.338.748-.752.788a7.775 7.775 0 00-6.985 6.984c-.04.414-.373.752-.788.752H8.525c-.416 0-.749-.338-.789-.752a7.775 7.775 0 00-6.984-6.984c-.414-.04-.752-.373-.752-.788V8.524c0-.415.338-.748.752-.788A7.775 7.775 0 007.736.752C7.776.338 8.11 0 8.526 0h6.95zM4.819 11.98a7.226 7.226 0 007.223 7.23 7.226 7.226 0 007.223-7.23c0-3.994-3.234-7.23-7.223-7.23a7.227 7.227 0 00-7.223 7.23z" fill="#EC0648" fill-rule="evenodd"/>
-            </svg>
+    <div class="w-full max-w-md">
+        <!-- Card -->
+        <div class="bg-dark-800/50 backdrop-blur-xl rounded-3xl border border-white/10 p-8 shadow-2xl">
+            <!-- Logo -->
+            <div class="flex justify-center mb-8">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-aurora-purple to-aurora-pink flex items-center justify-center animate-float shadow-lg shadow-aurora-purple/25">
+                    <svg class="w-12 h-12 text-white" viewBox="0 0 24 24">
+                        <path d="M15.477 0c.415 0 .749.338.788.752a7.775 7.775 0 006.985 6.984c.413.04.752.373.752.788v6.952c0 .415-.338.748-.752.788a7.775 7.775 0 00-6.985 6.984c-.04.414-.373.752-.788.752H8.525c-.416 0-.749-.338-.789-.752a7.775 7.775 0 00-6.984-6.984c-.414-.04-.752-.373-.752-.788V8.524c0-.415.338-.748.752-.788A7.775 7.775 0 007.736.752C7.776.338 8.11 0 8.526 0h6.95z" fill="currentColor"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Title -->
+            <div class="text-center mb-8">
+                <h1 class="font-serif text-3xl font-semibold mb-2">Welcome Back</h1>
+                <p class="text-zinc-400">Enter your password to continue</p>
+            </div>
+
+            <!-- Form -->
+            <form id="loginForm" class="space-y-6">
+                <div class="space-y-2">
+                    <label for="password" class="text-sm text-zinc-400">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required autofocus
+                        class="w-full h-14 px-5 rounded-xl bg-dark-700/50 border border-white/10 text-white placeholder-zinc-600 transition-all focus:border-aurora-purple/50 focus:ring-2 focus:ring-aurora-purple/20 focus:outline-none text-lg">
+                </div>
+
+                <button type="submit" class="w-full h-14 rounded-xl bg-gradient-to-r from-aurora-purple to-aurora-pink text-white font-semibold text-lg transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-lg shadow-aurora-purple/25">
+                    Sign In
+                </button>
+
+                <p id="errorMsg" class="hidden text-center text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+                    Invalid password. Please try again.
+                </p>
+            </form>
         </div>
-        <h1>Welcome Back</h1>
-        <p class="subtitle">Enter your password to continue</p>
-        <form id="loginForm">
-            <input type="password" id="password" placeholder="Password" required autofocus>
-            <button type="submit">Sign In</button>
-            <p class="error" id="errorMsg">Invalid password</p>
-        </form>
+
+        <!-- Footer -->
+        <p class="text-center text-zinc-600 text-sm mt-8">
+            Powered by <span class="bg-gradient-to-r from-aurora-purple to-aurora-pink bg-clip-text text-transparent font-medium">Fal.ai</span>
+        </p>
     </div>
 
     <script>
-        const form = document.getElementById('loginForm');
-        const errorMsg = document.getElementById('errorMsg');
-
-        form.addEventListener('submit', async (e) => {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const password = document.getElementById('password').value;
-            errorMsg.style.display = 'none';
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.classList.add('hidden');
 
             try {
-                const response = await fetch('/api/login', {
+                const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password })
                 });
-
-                if (response.ok) {
-                    window.location.href = '/';
-                } else {
-                    errorMsg.style.display = 'block';
-                }
-            } catch (error) {
-                console.error(error);
-                errorMsg.innerText = 'Connection error';
-                errorMsg.style.display = 'block';
+                if (res.ok) location.href = '/';
+                else errorMsg.classList.remove('hidden');
+            } catch (e) {
+                errorMsg.innerText = 'Connection error. Please try again.';
+                errorMsg.classList.remove('hidden');
             }
         });
     </script>
 </body>
-
 </html>

@@ -1,1400 +1,556 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fal.ai Image Generator</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg height='1em' viewBox='0 0 24 24' width='1em' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath clip-rule='evenodd' d='M15.477 0c.415 0 .749.338.788.752a7.775 7.775 0 006.985 6.984c.413.04.752.373.752.788v6.952c0 .415-.338.748-.752.788a7.775 7.775 0 00-6.985 6.984c-.04.414-.373.752-.788.752H8.525c-.416 0-.749-.338-.789-.752a7.775 7.775 0 00-6.984-6.984c-.414-.04-.752-.373-.752-.788V8.524c0-.415.338-.748.752-.788A7.775 7.775 0 007.736.752C7.776.338 8.11 0 8.526 0h6.95zM4.819 11.98a7.226 7.226 0 007.223 7.23 7.226 7.226 0 007.223-7.23c0-3.994-3.234-7.23-7.223-7.23a7.227 7.227 0 00-7.223 7.23z' fill='%23EC0648' fill-rule='evenodd'/%3E%3C/svg%3E">
-    <style>
-        :root {
-            /* iOS Liquid Glass - Light Mode */
-            --bg-gradient: linear-gradient(180deg, #e8eaef 0%, #f2f2f7 50%, #fafafa 100%);
-            --glass-bg: rgba(255, 255, 255, 0.72);
-            --glass-border: rgba(0, 0, 0, 0.08);
-            --text-primary: rgba(0, 0, 0, 0.88);
-            --text-secondary: rgba(0, 0, 0, 0.55);
-            --accent-color: #EC0648;
-            --accent-hover: #d10540;
-            --danger-color: #ff3b30;
-            --input-bg: rgba(0, 0, 0, 0.04);
-            --card-hover-border: rgba(236, 6, 72, 0.4);
-        }
-
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f2f2f7;
-            background-image: var(--bg-gradient);
-            background-attachment: fixed;
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Animated Background Orbs */
-        body::before, body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.5;
-            pointer-events: none;
-            z-index: -1;
-            animation: float 20s ease-in-out infinite;
-        }
-
-        body::before {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(236, 6, 72, 0.12) 0%, transparent 70%);
-            top: -150px;
-            right: -100px;
-        }
-
-        body::after {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-            bottom: -100px;
-            left: -100px;
-            animation-delay: -10s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(-30px, 30px) scale(1.05); }
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1400px;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            padding: 0.3rem;
-            justify-content: center;
-            position: sticky;
-            top: 1rem;
-            z-index: 100;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-            width: fit-content;
-            margin: 0 auto 1rem;
-        }
-
-        .tab-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            padding: 0.625rem 1.5rem;
-            border-radius: 12px;
-            transition: all 0.25s ease;
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-            color: white;
-            box-shadow: 0 2px 12px rgba(236, 6, 72, 0.3);
-        }
-
-        .tab-btn:hover:not(.active) {
-            background-color: rgba(0, 0, 0, 0.05);
-            color: var(--text-primary);
-        }
-
-        .view {
-            display: none;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
+    <title>Fal.ai Studio</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15.477 0c.415 0 .749.338.788.752a7.775 7.775 0 006.985 6.984c.413.04.752.373.752.788v6.952c0 .415-.338.748-.752.788a7.775 7.775 0 00-6.985 6.984c-.04.414-.373.752-.788.752H8.525c-.416 0-.749-.338-.789-.752a7.775 7.775 0 00-6.984-6.984c-.414-.04-.752-.373-.752-.788V8.524c0-.415.338-.748.752-.788A7.775 7.775 0 007.736.752C7.776.338 8.11 0 8.526 0h6.95zM4.819 11.98a7.226 7.226 0 007.223 7.23 7.226 7.226 0 007.223-7.23c0-3.994-3.234-7.23-7.223-7.23a7.227 7.227 0 00-7.223 7.23z' fill='%238B5CF6'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        aurora: { purple: '#8B5CF6', pink: '#EC4899', cyan: '#06B6D4', blue: '#3B82F6' },
+                        dark: { 900: '#09090b', 800: '#18181b', 700: '#27272a', 600: '#3f3f46' }
+                    }
+                }
             }
         }
-
-        .view.active {
-            display: grid;
-        }
-
-        #generator-view,
-        #collection-view,
-        #video-view {
-            grid-template-columns: 380px 1fr;
-            gap: 2.5rem;
-            align-items: start;
-            /* Important for sticky sidebar */
-        }
-
-        @media (max-width: 900px) {
-
-            #generator-view,
-            #collection-view,
-            #video-view {
-                grid-template-columns: 1fr;
-            }
-
-            .controls {
-                position: static !important;
-            }
-        }
-
-        .controls {
-            background: var(--glass-bg);
-            padding: 2rem;
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06),
-                       inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            position: sticky;
-            top: 5rem;
-            max-height: calc(100vh - 7rem);
-            overflow-y: auto;
-            scrollbar-width: thin;
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            margin-top: 0;
-            margin-bottom: 2rem;
-            text-align: center;
-            background: linear-gradient(135deg, #EC0648, #ff3366);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group.hidden {
-            display: none;
-        }
-
-        label {
-            display: block;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        select,
-        input,
-        textarea {
-            width: 100%;
-            background-color: var(--input-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 0.875rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        select:focus,
-        input:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 4px rgba(236, 6, 72, 0.1);
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-            line-height: 1.5;
-        }
-
-        .generate-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-            color: white;
-            border: none;
-            padding: 1rem;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s;
-            margin-top: 1rem;
-            font-size: 1rem;
-            box-shadow: 0 4px 16px rgba(236, 6, 72, 0.25);
-        }
-
-        .generate-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(236, 6, 72, 0.35);
-        }
-
-        .generate-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        #gallery-view,
-        #collection-gallery,
-        #video-gallery {
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .result-card {
-            background: var(--glass-bg);
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            height: 100%;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-        }
-
-        .result-card:hover {
-            border-color: var(--card-hover-border);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .image-container {
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.03);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 300px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-container img {
-            width: 100%;
-            height: auto;
-            object-fit: contain;
-            display: block;
-            transition: transform 0.5s;
-        }
-
-        .result-card:hover .image-container img {
-            transform: scale(1.02);
-        }
-
-        .image-details {
-            padding: 1.5rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .prompt-text {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            white-space: pre-wrap;
-            flex-grow: 1;
-            max-height: 150px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.03);
-            padding: 1rem;
-            border-radius: 12px;
-            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-        }
-
-        .meta-info {
-            display: flex;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 1.25rem;
-            flex-wrap: wrap;
-        }
-
-        .meta-tag {
-            background-color: rgba(0, 0, 0, 0.05);
-            padding: 0.25rem 0.75rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-        }
-
-        .actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: auto;
-        }
-
-        .action-btn {
-            background-color: rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            color: var(--text-secondary);
-            padding: 0.6rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-            flex: 1;
-            text-align: center;
-            text-decoration: none;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .action-btn:hover {
-            background-color: rgba(0, 0, 0, 0.08);
-            color: var(--text-primary);
-            border-color: rgba(0, 0, 0, 0.1);
-        }
-
-        .action-btn.danger:hover {
-            background-color: rgba(255, 59, 48, 0.1);
-            color: var(--danger-color);
-            border-color: rgba(255, 59, 48, 0.2);
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-secondary);
-            grid-column: 1 / -1;
-            background: var(--glass-bg);
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-top: 3px solid var(--accent-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1.5rem;
-        }
-
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-secondary);
-            background: var(--glass-bg);
-            border-radius: 20px;
-            border: 1px dashed rgba(0, 0, 0, 0.12);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            height: 100%;
-            min-height: 400px;
-        }
-
-        .empty-state svg {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 1.5rem;
-            opacity: 0.3;
-            color: var(--accent-color);
-        }
-
-        .empty-state h3 {
-            font-size: 1.25rem;
-            color: var(--text-primary);
-            margin: 0 0 0.5rem 0;
-        }
-
-        .empty-state p {
-            max-width: 300px;
-            margin: 0;
-            line-height: 1.5;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        /* Video Card Styles */
-        .video-container {
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.03);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 200px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .video-container video {
-            width: 100%;
-            height: auto;
-            max-height: 400px;
-            object-fit: contain;
-            display: block;
-        }
-
-        .video-type-badge {
-            position: absolute;
-            top: 0.75rem;
-            left: 0.75rem;
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            z-index: 10;
-        }
-
-        .source-image-preview {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px solid var(--glass-border);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .source-image-preview:hover {
-            transform: scale(1.1);
-        }
-
-        .source-image-row {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-            padding: 0.5rem;
-            background: rgba(0, 0, 0, 0.03);
-            border-radius: 8px;
-        }
-
-        .source-image-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-    </style>
+    </script>
 </head>
-
-<body>
-    <div class="container">
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('generator')">Generator</button>
-            <button class="tab-btn" onclick="switchTab('gallery')">Gallery</button>
-            <button class="tab-btn" onclick="switchTab('collection')">Collection</button>
-            <button class="tab-btn" onclick="switchTab('video')">Video</button>
-        </div>
-
-        <!-- Generator View -->
-        <div id="generator-view" class="view active">
-            <div class="controls">
-                <h1>Fal.ai Generator</h1>
-
-                <div class="form-group">
-                    <label for="model">Model</label>
-                    <select id="model" onchange="updateControls()">
-                        <option value="flux-1.1-pro-ultra">Flux 1.1 Pro Ultra</option>
-                        <option value="flux-2-pro">FLUX 2 Pro</option>
-                        <option value="imagen4-preview">Imagen 4 Preview</option>
-                        <option value="nano-banana-pro">Nano Banana Pro</option>
-                        <option value="flux-2-pro-edit">FLUX 2 Pro Edit</option>
-                        <option value="nano-banana-pro-edit">Gemini 3 Pro Image Edit</option>
-                    </select>
-                </div>
-
-                <div class="form-group" id="control-aspect-ratio">
-                    <label for="aspect_ratio">Aspect Ratio</label>
-                    <select id="aspect_ratio">
-                        <option value="16:9">16:9 (Landscape)</option>
-                        <option value="1:1" selected>1:1 (Square)</option>
-                        <option value="9:16">9:16 (Portrait)</option>
-                        <option value="4:3">4:3</option>
-                        <option value="3:2">3:2</option>
-                        <option value="2:3">2:3</option>
-                        <option value="3:4">3:4</option>
-                    </select>
-                </div>
-
-                <div class="form-group hidden" id="control-resolution">
-                    <label for="resolution">Resolution</label>
-                    <select id="resolution">
-                        <option value="1K" selected>1K (Standard)</option>
-                        <option value="2K">2K (High)</option>
-                        <option value="4K">4K (Ultra)</option>
-                    </select>
-                </div>
-
-                <div class="form-group hidden" id="control-safety">
-                    <label for="safety_tolerance">Safety Tolerance</label>
-                    <select id="safety_tolerance">
-                        <option value="1">1 (Strict)</option>
-                        <option value="2" selected>2 (Normal)</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5 (Permissive)</option>
-                    </select>
-                </div>
-
-                <div class="form-group hidden" id="control-edit">
-                    <label for="image_url">Source Image URL</label>
-                    <input type="text" id="image_url" placeholder="https://example.com/image.jpg">
-                    <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">Enter the URL of
-                        the image you want to edit</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="prompt">Prompt</label>
-                    <textarea id="prompt" placeholder="Describe the image you want to generate..."></textarea>
-                </div>
-
-                <button id="generateBtn" class="generate-btn">Generate Image</button>
-            </div>
-
-            <div class="gallery" id="current-result">
-                <!-- Empty State -->
-                <div id="empty-state" class="empty-state">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <h3>Ready to Create</h3>
-                    <p>Select a model, adjust the settings, and describe your vision to start generating amazing images.
-                    </p>
-                </div>
-
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>Generating your masterpiece...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Gallery View -->
-        <div id="gallery-view" class="view">
-            <!-- Auto-generated images will be loaded here -->
-        </div>
-
-        <!-- Collection View -->
-        <div id="collection-view" class="view">
-            <div class="controls">
-                <h1>Manual Collection</h1>
-
-                <div class="form-group">
-                    <label for="manual-url">Image URL</label>
-                    <input type="text" id="manual-url" placeholder="https://example.com/image.jpg">
-                </div>
-
-                <div class="form-group">
-                    <label for="manual-prompt">Prompt</label>
-                    <textarea id="manual-prompt"
-                        placeholder="Enter the prompt used to generate this image..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="manual-model">Model (Optional)</label>
-                    <input type="text" id="manual-model" placeholder="e.g., DALL-E, Midjourney, etc.">
-                </div>
-
-                <div class="form-group">
-                    <label for="manual-aspect">Aspect Ratio (Optional)</label>
-                    <select id="manual-aspect">
-                        <option value="">Select...</option>
-                        <option value="16:9">16:9</option>
-                        <option value="1:1">1:1</option>
-                        <option value="9:16">9:16</option>
-                        <option value="4:3">4:3</option>
-                    </select>
-                </div>
-
-                <button id="addManualBtn" class="generate-btn">Add to Collection</button>
-            </div>
-
-            <div id="collection-gallery" style="display: grid; margin-top: 0;">
-                <!-- Manual collection items will be loaded here -->
-            </div>
-        </div>
-
-        <!-- Video Collection View -->
-        <div id="video-view" class="view">
-            <div class="controls">
-                <h1>Video Collection</h1>
-
-                <div class="form-group">
-                    <label for="video-type">Video Type</label>
-                    <select id="video-type" onchange="updateVideoForm()">
-                        <option value="text-to-video">Text to Video (文生视频)</option>
-                        <option value="image-to-video">Image to Video (图生视频)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="video-url">Video URL</label>
-                    <input type="text" id="video-url" placeholder="https://example.com/video.mp4">
-                </div>
-
-                <div class="form-group hidden" id="video-source-image-group">
-                    <label for="video-source-image">Source Image URL</label>
-                    <input type="text" id="video-source-image" placeholder="https://example.com/source-image.jpg">
-                </div>
-
-                <div class="form-group">
-                    <label for="video-prompt">Prompt</label>
-                    <textarea id="video-prompt" placeholder="Enter the prompt used to generate this video..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="video-model">Model</label>
-                    <input type="text" id="video-model" placeholder="e.g., Runway, Pika, Kling, etc.">
-                </div>
-
-                <div class="form-group">
-                    <label for="video-aspect">Aspect Ratio</label>
-                    <select id="video-aspect">
-                        <option value="">Select...</option>
-                        <option value="16:9">16:9</option>
-                        <option value="9:16">9:16</option>
-                        <option value="1:1">1:1</option>
-                        <option value="4:3">4:3</option>
-                        <option value="3:4">3:4</option>
-                        <option value="21:9">21:9</option>
-                    </select>
-                </div>
-
-                <button id="addVideoBtn" class="generate-btn">Add to Collection</button>
-            </div>
-
-            <div id="video-gallery" style="display: grid; margin-top: 0;">
-                <!-- Video collection items will be loaded here -->
-            </div>
-        </div>
+<body class="font-sans bg-dark-900 text-zinc-100 min-h-screen overflow-x-hidden">
+    <!-- Aurora Background -->
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div class="absolute -top-1/2 -left-1/4 w-[800px] h-[800px] bg-aurora-purple/20 rounded-full blur-[120px] animate-pulse"></div>
+        <div class="absolute -bottom-1/4 -right-1/4 w-[600px] h-[600px] bg-aurora-pink/15 rounded-full blur-[100px]"></div>
+        <div class="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-aurora-cyan/10 rounded-full blur-[80px]"></div>
     </div>
 
-    <script>
-        const generateBtn = document.getElementById('generateBtn');
-        const addManualBtn = document.getElementById('addManualBtn');
-        const addVideoBtn = document.getElementById('addVideoBtn');
-        const currentResult = document.getElementById('current-result');
-        const loading = document.getElementById('loading');
-        const galleryView = document.getElementById('gallery-view');
-        const collectionGallery = document.getElementById('collection-gallery');
-        const videoGallery = document.getElementById('video-gallery');
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-72 border-r border-white/5 bg-dark-900/80 backdrop-blur-xl flex flex-col fixed h-full z-40">
+            <!-- Logo -->
+            <div class="p-6 border-b border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-aurora-purple to-aurora-pink flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24"><path d="M15.477 0c.415 0 .749.338.788.752a7.775 7.775 0 006.985 6.984c.413.04.752.373.752.788v6.952c0 .415-.338.748-.752.788a7.775 7.775 0 00-6.985 6.984c-.04.414-.373.752-.788.752H8.525c-.416 0-.749-.338-.789-.752a7.775 7.775 0 00-6.984-6.984c-.414-.04-.752-.373-.752-.788V8.524c0-.415.338-.748.752-.788A7.775 7.775 0 007.736.752C7.776.338 8.11 0 8.526 0h6.95z" fill="currentColor"/></svg>
+                    </div>
+                    <div>
+                        <h1 class="font-serif text-xl font-semibold">Fal.ai</h1>
+                        <p class="text-xs text-zinc-500">Creative Studio</p>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Navigation -->
+            <nav class="flex-1 p-4 space-y-1">
+                <button class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer" data-tab="create">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                    <span class="font-medium">Create</span>
+                </button>
+                <button class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer" data-tab="gallery">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5z"/></svg>
+                    <span class="font-medium">Gallery</span>
+                </button>
+                <button class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer" data-tab="collection">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    <span class="font-medium">Collection</span>
+                </button>
+                <button class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer" data-tab="video">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h1.5C5.496 19.5 6 18.996 6 18.375m-3.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-1.5A1.125 1.125 0 0118 18.375M20.625 4.5H3.375m17.25 0c.621 0 1.125.504 1.125 1.125M20.625 4.5h-1.5C18.504 4.5 18 5.004 18 5.625m3.75 0v1.5c0 .621-.504 1.125-1.125 1.125M3.375 4.5c-.621 0-1.125.504-1.125 1.125M3.375 4.5h1.5C5.496 4.5 6 5.004 6 5.625m-3.75 0v1.5c0 .621.504 1.125 1.125 1.125m0 0h1.5m-1.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m1.5-3.75C5.496 8.25 6 7.746 6 7.125v-1.5M4.875 8.25C5.496 8.25 6 8.754 6 9.375v1.5m0-5.25v5.25m0-5.25C6 5.004 6.504 4.5 7.125 4.5h9.75c.621 0 1.125.504 1.125 1.125m1.125 2.625h1.5m-1.5 0A1.125 1.125 0 0118 7.125v-1.5m1.125 2.625c-.621 0-1.125.504-1.125 1.125v1.5m2.625-2.625c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125M18 5.625v5.25M7.125 12h9.75m-9.75 0A1.125 1.125 0 016 10.875M7.125 12C6.504 12 6 12.504 6 13.125m0-2.25C6 11.496 5.496 12 4.875 12M18 10.875c0 .621-.504 1.125-1.125 1.125M18 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m-12 5.25v-5.25m0 5.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125m-12 0v-1.5c0-.621-.504-1.125-1.125-1.125M18 18.375v-5.25m0 5.25v-1.5c0-.621.504-1.125 1.125-1.125M18 13.125v1.5c0 .621.504 1.125 1.125 1.125M18 13.125c0-.621.504-1.125 1.125-1.125M6 13.125v1.5c0 .621-.504 1.125-1.125 1.125M6 13.125C6 12.504 5.496 12 4.875 12m-1.5 0h1.5m14.25 0h1.5"/></svg>
+                    <span class="font-medium">Video</span>
+                </button>
+            </nav>
+
+            <!-- Footer -->
+            <div class="p-4 border-t border-white/5">
+                <div class="px-4 py-3 rounded-xl bg-gradient-to-r from-aurora-purple/10 to-aurora-pink/10 border border-white/5">
+                    <p class="text-xs text-zinc-400">Powered by</p>
+                    <p class="text-sm font-medium text-white">Fal.ai API</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-72">
+            <!-- Create View -->
+            <div id="create-view" class="view p-8">
+                <div class="max-w-6xl mx-auto">
+                    <!-- Header -->
+                    <div class="mb-8">
+                        <h2 class="font-serif text-4xl font-semibold mb-2">Create Magic</h2>
+                        <p class="text-zinc-400">Transform your imagination into stunning visuals</p>
+                    </div>
+
+                    <!-- Bento Grid Layout -->
+                    <div class="grid grid-cols-12 gap-6">
+                        <!-- Controls Card - Spans 5 columns -->
+                        <div class="col-span-12 lg:col-span-5 space-y-6">
+                            <div class="bg-dark-800/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6">
+                                <h3 class="text-lg font-medium mb-6 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-aurora-purple"></span>
+                                    Configuration
+                                </h3>
+
+                                <!-- Model -->
+                                <div class="space-y-2 mb-5">
+                                    <label class="text-sm text-zinc-400">Model</label>
+                                    <select id="model" class="w-full h-12 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white transition-all focus:border-aurora-purple/50 focus:ring-2 focus:ring-aurora-purple/20 cursor-pointer">
+                                        <option value="flux-1.1-pro-ultra">Flux 1.1 Pro Ultra</option>
+                                        <option value="flux-2-pro">FLUX 2 Pro</option>
+                                        <option value="imagen4-preview">Imagen 4 Preview</option>
+                                        <option value="nano-banana-pro">Nano Banana Pro</option>
+                                        <option value="flux-2-pro-edit">FLUX 2 Pro Edit</option>
+                                        <option value="nano-banana-pro-edit">Gemini 3 Pro Image Edit</option>
+                                    </select>
+                                </div>
+
+                                <!-- Aspect Ratio -->
+                                <div id="control-aspect-ratio" class="space-y-2 mb-5">
+                                    <label class="text-sm text-zinc-400">Aspect Ratio</label>
+                                    <div class="grid grid-cols-4 gap-2" id="aspect-grid">
+                                        <button type="button" class="aspect-btn active h-10 rounded-lg border border-white/10 text-sm transition-all cursor-pointer" data-value="1:1">1:1</button>
+                                        <button type="button" class="aspect-btn h-10 rounded-lg border border-white/10 text-sm transition-all cursor-pointer" data-value="16:9">16:9</button>
+                                        <button type="button" class="aspect-btn h-10 rounded-lg border border-white/10 text-sm transition-all cursor-pointer" data-value="9:16">9:16</button>
+                                        <button type="button" class="aspect-btn h-10 rounded-lg border border-white/10 text-sm transition-all cursor-pointer" data-value="4:3">4:3</button>
+                                    </div>
+                                    <input type="hidden" id="aspect_ratio" value="1:1">
+                                </div>
+
+                                <!-- Resolution (hidden) -->
+                                <div id="control-resolution" class="space-y-2 mb-5 hidden">
+                                    <label class="text-sm text-zinc-400">Resolution</label>
+                                    <select id="resolution" class="w-full h-12 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white transition-all focus:border-aurora-purple/50 cursor-pointer">
+                                        <option value="1K">1K Standard</option>
+                                        <option value="2K">2K High</option>
+                                        <option value="4K">4K Ultra</option>
+                                    </select>
+                                </div>
+
+                                <!-- Safety (hidden) -->
+                                <div id="control-safety" class="space-y-2 mb-5 hidden">
+                                    <label class="text-sm text-zinc-400">Safety Level</label>
+                                    <input type="range" id="safety_tolerance" min="1" max="5" value="2" class="w-full accent-aurora-purple cursor-pointer">
+                                    <div class="flex justify-between text-xs text-zinc-500"><span>Strict</span><span>Permissive</span></div>
+                                </div>
+
+                                <!-- Edit URL (hidden) -->
+                                <div id="control-edit" class="space-y-2 mb-5 hidden">
+                                    <label class="text-sm text-zinc-400">Source Image URL</label>
+                                    <input type="text" id="image_url" placeholder="https://..." class="w-full h-12 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white placeholder-zinc-600 transition-all focus:border-aurora-purple/50">
+                                </div>
+                            </div>
+
+                            <!-- Prompt Card -->
+                            <div class="bg-dark-800/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6">
+                                <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-aurora-pink"></span>
+                                    Prompt
+                                </h3>
+                                <textarea id="prompt" rows="5" placeholder="Describe your vision in detail..." class="w-full px-4 py-3 rounded-xl bg-dark-700/50 border border-white/10 text-white placeholder-zinc-600 resize-none transition-all focus:border-aurora-purple/50 focus:ring-2 focus:ring-aurora-purple/20"></textarea>
+                                <button id="generateBtn" class="w-full mt-4 h-14 rounded-xl bg-gradient-to-r from-aurora-purple to-aurora-pink text-white font-semibold transition-all hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                                    Generate
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Preview Card - Spans 7 columns -->
+                        <div class="col-span-12 lg:col-span-7">
+                            <div id="preview-area" class="bg-dark-800/30 backdrop-blur-sm rounded-2xl border border-white/5 min-h-[500px] flex items-center justify-center overflow-hidden">
+                                <!-- Empty State -->
+                                <div id="empty-state" class="text-center p-12">
+                                    <div class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-aurora-purple/20 to-aurora-pink/20 flex items-center justify-center">
+                                        <svg class="w-12 h-12 text-aurora-purple/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5z"/></svg>
+                                    </div>
+                                    <h3 class="font-serif text-2xl font-medium mb-2">Your Canvas Awaits</h3>
+                                    <p class="text-zinc-500 max-w-sm mx-auto">Configure your settings and describe your vision to bring your imagination to life.</p>
+                                </div>
+                                <!-- Loading State -->
+                                <div id="loading" class="hidden text-center p-12">
+                                    <div class="w-16 h-16 mx-auto mb-6 rounded-full border-2 border-aurora-purple/20 border-t-aurora-purple animate-spin"></div>
+                                    <p class="text-zinc-400">Creating your masterpiece...</p>
+                                </div>
+                                <!-- Result will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery View -->
+            <div id="gallery-view" class="view hidden p-8">
+                <div class="max-w-7xl mx-auto">
+                    <div class="mb-8">
+                        <h2 class="font-serif text-4xl font-semibold mb-2">Gallery</h2>
+                        <p class="text-zinc-400">Your generated masterpieces</p>
+                    </div>
+                    <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+                </div>
+            </div>
+
+            <!-- Collection View -->
+            <div id="collection-view" class="view hidden p-8">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex flex-col lg:flex-row gap-8">
+                        <!-- Add Form -->
+                        <div class="lg:w-80 shrink-0">
+                            <div class="bg-dark-800/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6 sticky top-8">
+                                <h3 class="text-lg font-medium mb-6">Add to Collection</h3>
+                                <div class="space-y-4">
+                                    <div><label class="text-sm text-zinc-400 block mb-2">Image URL</label><input type="text" id="manual-url" placeholder="https://..." class="w-full h-11 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white placeholder-zinc-600"></div>
+                                    <div><label class="text-sm text-zinc-400 block mb-2">Prompt</label><textarea id="manual-prompt" rows="3" placeholder="Describe..." class="w-full px-4 py-3 rounded-xl bg-dark-700/50 border border-white/10 text-white placeholder-zinc-600 resize-none"></textarea></div>
+                                    <div><label class="text-sm text-zinc-400 block mb-2">Model</label><input type="text" id="manual-model" placeholder="Optional" class="w-full h-11 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white placeholder-zinc-600"></div>
+                                    <div><label class="text-sm text-zinc-400 block mb-2">Aspect</label><select id="manual-aspect" class="w-full h-11 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white cursor-pointer"><option value="">Select...</option><option value="1:1">1:1</option><option value="16:9">16:9</option><option value="9:16">9:16</option></select></div>
+                                    <button id="addManualBtn" class="w-full h-12 rounded-xl bg-gradient-to-r from-aurora-purple to-aurora-pink text-white font-medium cursor-pointer hover:opacity-90">Add Image</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Grid -->
+                        <div class="flex-1">
+                            <div class="mb-6"><h2 class="font-serif text-4xl font-semibold mb-2">Collection</h2><p class="text-zinc-400">Manually curated images</p></div>
+                            <div id="collection-gallery" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video View -->
+            <div id="video-view" class="view hidden p-8">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex flex-col lg:flex-row gap-8">
+                        <!-- Add Form -->
+                        <div class="lg:w-80 shrink-0">
+                            <div class="bg-dark-800/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6 sticky top-8">
+                                <h3 class="text-lg font-medium mb-6">Add Video</h3>
+                                <div class="space-y-4">
+                                    <div><label class="text-sm text-zinc-400 block mb-2">Type</label><select id="video-type" class="w-full h-11 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white cursor-pointer"><option value="text-to-video">Text to Video</option><option value="image-to-video">Image to Video</option></select></div>
+                                    <div><label class="text-sm text-zinc-400 block mb-2">Video URL</label><input type="text" id="video-url" placeholder="https://..." class="w-full h-11 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white placeholder-zinc-600"></div>
+                                    <div id="video-source-image-group" class="hidden"><label class="text-sm text-zinc-400 block mb-2">Source Image</label><input type="text" id="video-source-image" placeholder="https://..." class="w-full h-11 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white placeholder-zinc-600"></div>
+                                    <div><label class="text-sm text-zinc-400 block mb-2">Prompt</label><textarea id="video-prompt" rows="3" placeholder="Describe..." class="w-full px-4 py-3 rounded-xl bg-dark-700/50 border border-white/10 text-white placeholder-zinc-600 resize-none"></textarea></div>
+                                    <div><label class="text-sm text-zinc-400 block mb-2">Model</label><input type="text" id="video-model" placeholder="Runway, Pika..." class="w-full h-11 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white placeholder-zinc-600"></div>
+                                    <div><label class="text-sm text-zinc-400 block mb-2">Aspect</label><select id="video-aspect" class="w-full h-11 px-4 rounded-xl bg-dark-700/50 border border-white/10 text-white cursor-pointer"><option value="">Select...</option><option value="16:9">16:9</option><option value="9:16">9:16</option><option value="1:1">1:1</option></select></div>
+                                    <button id="addVideoBtn" class="w-full h-12 rounded-xl bg-gradient-to-r from-aurora-purple to-aurora-pink text-white font-medium cursor-pointer hover:opacity-90">Add Video</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Grid -->
+                        <div class="flex-1">
+                            <div class="mb-6"><h2 class="font-serif text-4xl font-semibold mb-2">Videos</h2><p class="text-zinc-400">Your video collection</p></div>
+                            <div id="video-gallery" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        
+        .nav-btn { color: #71717a; }
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: #e4e4e7; }
+        .nav-btn.active { background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(236,72,153,0.15)); color: #fff; border: 1px solid rgba(139,92,246,0.3); }
+        
+        .aspect-btn { background: rgba(39,39,42,0.5); color: #a1a1aa; }
+        .aspect-btn:hover { background: rgba(63,63,70,0.5); color: #fff; }
+        .aspect-btn.active { background: linear-gradient(135deg, #8B5CF6, #EC4899); color: #fff; border-color: transparent; }
+        
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+        
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+        
+        /* Mobile sidebar */
+        @media (max-width: 1024px) {
+            aside { transform: translateX(-100%); transition: transform 0.3s ease; }
+            aside.open { transform: translateX(0); }
+            main { margin-left: 0 !important; }
+        }
+    </style>
+
+    <script>
+        // Elements
+        const $ = id => document.getElementById(id);
+        const generateBtn = $('generateBtn'), addManualBtn = $('addManualBtn'), addVideoBtn = $('addVideoBtn');
+        const previewArea = $('preview-area'), emptyState = $('empty-state'), loading = $('loading');
+        const galleryGrid = $('gallery-grid'), collectionGallery = $('collection-gallery'), videoGallery = $('video-gallery');
+
+        // Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            const view = $(`${tab}-view`);
+            if (view) { view.classList.remove('hidden'); view.classList.add('animate-fade-in'); }
+            if (tab === 'gallery') loadGallery();
+            else if (tab === 'collection') loadCollection();
+            else if (tab === 'video') loadVideos();
+        }
+
+        // Aspect ratio buttons
+        document.querySelectorAll('.aspect-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                $('aspect_ratio').value = btn.dataset.value;
+            });
+        });
+
+        // Model change
+        $('model').addEventListener('change', updateControls);
         updateControls();
 
-        // Video form toggle
-        function updateVideoForm() {
-            const videoType = document.getElementById('video-type').value;
-            const sourceImageGroup = document.getElementById('video-source-image-group');
-            
-            if (videoType === 'image-to-video') {
-                sourceImageGroup.classList.remove('hidden');
-            } else {
-                sourceImageGroup.classList.add('hidden');
-            }
-        }
-
         function updateControls() {
-            const model = document.getElementById('model').value;
-            const resolutionGroup = document.getElementById('control-resolution');
-            const safetyGroup = document.getElementById('control-safety');
-            const editGroup = document.getElementById('control-edit');
-            const aspectRatioGroup = document.getElementById('control-aspect-ratio');
-            const aspectRatioSelect = document.getElementById('aspect_ratio');
-            const promptInput = document.getElementById('prompt');
-
-            // Clear prompt when switching models
-            promptInput.value = '';
-
-            // Clear aspect ratio options
-            aspectRatioSelect.innerHTML = '';
-
-            // Model-specific aspect ratios
-            if (model === 'flux-2-pro') {
-                // FLUX 2 Pro supports: square, landscape_16_9, portrait_16_9, landscape_4_3, portrait_4_3
-                const options = [
-                    { value: '1:1', label: '1:1 (Square)' },
-                    { value: '16:9', label: '16:9 (Landscape)' },
-                    { value: '9:16', label: '9:16 (Portrait)' },
-                    { value: '4:3', label: '4:3' },
-                    { value: '3:2', label: '3:2' }
-                ];
-                options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.textContent = opt.label;
-                    if (opt.value === '1:1') option.selected = true;
-                    aspectRatioSelect.appendChild(option);
+            const model = $('model').value;
+            $('prompt').value = '';
+            $('control-resolution').classList.toggle('hidden', !['nano-banana-pro', 'imagen4-preview', 'nano-banana-pro-edit'].includes(model));
+            $('control-safety').classList.toggle('hidden', !['flux-1.1-pro-ultra', 'flux-2-pro', 'flux-2-pro-edit'].includes(model));
+            $('control-edit').classList.toggle('hidden', !['flux-2-pro-edit', 'nano-banana-pro-edit'].includes(model));
+            
+            // Update aspect buttons based on model
+            const grid = $('aspect-grid');
+            const aspects = getAspects(model);
+            grid.innerHTML = aspects.map((a, i) => `<button type="button" class="aspect-btn ${i===0?'active':''} h-10 rounded-lg border border-white/10 text-sm transition-all cursor-pointer" data-value="${a}">${a}</button>`).join('');
+            $('aspect_ratio').value = aspects[0];
+            grid.querySelectorAll('.aspect-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    grid.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    $('aspect_ratio').value = btn.dataset.value;
                 });
-            } else if (model === 'imagen4-preview') {
-                // Imagen 4 supports: 1:1, 16:9, 9:16, 4:3, 3:4
-                const options = [
-                    { value: '1:1', label: '1:1 (Square)', selected: true },
-                    { value: '16:9', label: '16:9 (Landscape)' },
-                    { value: '9:16', label: '9:16 (Portrait)' },
-                    { value: '4:3', label: '4:3' },
-                    { value: '3:4', label: '3:4' }
-                ];
-                options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.textContent = opt.label;
-                    if (opt.selected) option.selected = true;
-                    aspectRatioSelect.appendChild(option);
-                });
-            } else if (model === 'flux-1.1-pro-ultra') {
-                // FLUX 1.1 Pro Ultra supports many ratios including 21:9 and 9:21
-                const options = [
-                    { value: '21:9', label: '21:9 (Ultra Wide)' },
-                    { value: '16:9', label: '16:9 (Landscape)' },
-                    { value: '4:3', label: '4:3' },
-                    { value: '3:2', label: '3:2' },
-                    { value: '1:1', label: '1:1 (Square)', selected: true },
-                    { value: '2:3', label: '2:3' },
-                    { value: '3:4', label: '3:4' },
-                    { value: '9:16', label: '9:16 (Portrait)' },
-                    { value: '9:21', label: '9:21 (Ultra Tall)' }
-                ];
-                options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.textContent = opt.label;
-                    if (opt.selected) option.selected = true;
-                    aspectRatioSelect.appendChild(option);
-                });
-            } else if (model === 'nano-banana-pro') {
-                // Nano Banana Pro supports: 21:9, 16:9, 3:2, 4:3, 5:4, 1:1, 4:5, 3:4, 2:3, 9:16
-                const options = [
-                    { value: '21:9', label: '21:9 (Ultra Wide)' },
-                    { value: '16:9', label: '16:9 (Landscape)' },
-                    { value: '3:2', label: '3:2' },
-                    { value: '4:3', label: '4:3' },
-                    { value: '5:4', label: '5:4' },
-                    { value: '1:1', label: '1:1 (Square)', selected: true },
-                    { value: '4:5', label: '4:5' },
-                    { value: '3:4', label: '3:4' },
-                    { value: '2:3', label: '2:3' },
-                    { value: '9:16', label: '9:16 (Portrait)' }
-                ];
-                options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.textContent = opt.label;
-                    if (opt.selected) option.selected = true;
-                    aspectRatioSelect.appendChild(option);
-                });
-            } else if (model === 'flux-2-pro-edit') {
-                // FLUX 2 Pro Edit supports the same aspect ratios as FLUX 2 Pro (uses image_size with auto option)
-                const options = [
-                    { value: '1:1', label: '1:1 (Square)' },
-                    { value: '16:9', label: '16:9 (Landscape)' },
-                    { value: '9:16', label: '9:16 (Portrait)' },
-                    { value: '4:3', label: '4:3' },
-                    { value: '3:2', label: '3:2' }
-                ];
-                options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.textContent = opt.label;
-                    if (opt.value === '1:1') option.selected = true;
-                    aspectRatioSelect.appendChild(option);
-                });
-            } else if (model === 'nano-banana-pro-edit') {
-                // Nano Banana Pro Edit supports: auto, 21:9, 16:9, 3:2, 4:3, 5:4, 1:1, 4:5, 3:4, 2:3, 9:16
-                const options = [
-                    { value: 'auto', label: 'Auto (Keep Original)', selected: true },
-                    { value: '21:9', label: '21:9 (Ultra Wide)' },
-                    { value: '16:9', label: '16:9 (Landscape)' },
-                    { value: '3:2', label: '3:2' },
-                    { value: '4:3', label: '4:3' },
-                    { value: '5:4', label: '5:4' },
-                    { value: '1:1', label: '1:1 (Square)' },
-                    { value: '4:5', label: '4:5' },
-                    { value: '3:4', label: '3:4' },
-                    { value: '2:3', label: '2:3' },
-                    { value: '9:16', label: '9:16 (Portrait)' }
-                ];
-                options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.textContent = opt.label;
-                    if (opt.selected) option.selected = true;
-                    aspectRatioSelect.appendChild(option);
-                });
-            } else {
-                // Default aspect ratios for other models
-                const options = [
-                    { value: '16:9', label: '16:9 (Landscape)' },
-                    { value: '1:1', label: '1:1 (Square)', selected: true },
-                    { value: '9:16', label: '9:16 (Portrait)' },
-                    { value: '4:3', label: '4:3' },
-                    { value: '3:2', label: '3:2' },
-                    { value: '2:3', label: '2:3' },
-                    { value: '3:4', label: '3:4' }
-                ];
-                options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.textContent = opt.label;
-                    if (opt.selected) option.selected = true;
-                    aspectRatioSelect.appendChild(option);
-                });
-            }
-
-            resolutionGroup.classList.add('hidden');
-            safetyGroup.classList.add('hidden');
-            editGroup.classList.add('hidden');
-
-            // Show resolution for models that support it
-            if (model === 'nano-banana-pro' || model === 'imagen4-preview' || model === 'nano-banana-pro-edit') {
-                resolutionGroup.classList.remove('hidden');
-            }
-
-            // Show safety tolerance for FLUX models
-            if (model === 'flux-1.1-pro-ultra' || model === 'flux-2-pro' || model === 'flux-2-pro-edit') {
-                safetyGroup.classList.remove('hidden');
-            }
-
-            // Show image URL input for image-to-image models
-            if (model === 'flux-2-pro-edit' || model === 'nano-banana-pro-edit') {
-                editGroup.classList.remove('hidden');
-            }
+            });
         }
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
-
-            const btn = document.querySelector(`button[onclick="switchTab('${tabName}')"]`);
-            const view = document.getElementById(`${tabName}-view`);
-
-            if (btn) btn.classList.add('active');
-            if (view) view.classList.add('active');
-
-            if (tabName === 'gallery') {
-                loadGallery();
-            } else if (tabName === 'collection') {
-                loadCollection();
-            } else if (tabName === 'video') {
-                loadVideos();
-            }
+        function getAspects(model) {
+            const map = {
+                'flux-1.1-pro-ultra': ['1:1','16:9','9:16','21:9','4:3','3:2'],
+                'flux-2-pro': ['1:1','16:9','9:16','4:3','3:2'],
+                'imagen4-preview': ['1:1','16:9','9:16','4:3','3:4'],
+                'nano-banana-pro': ['1:1','16:9','9:16','4:3','3:2','21:9'],
+                'flux-2-pro-edit': ['1:1','16:9','9:16','4:3'],
+                'nano-banana-pro-edit': ['auto','1:1','16:9','9:16','4:3']
+            };
+            return map[model] || ['1:1','16:9','9:16','4:3'];
         }
 
-        // Generate Image
+        // Video type toggle
+        $('video-type').addEventListener('change', () => {
+            $('video-source-image-group').classList.toggle('hidden', $('video-type').value !== 'image-to-video');
+        });
+
+        // Generate
         generateBtn.addEventListener('click', async () => {
-            const model = document.getElementById('model').value;
-            const aspectRatio = document.getElementById('aspect_ratio').value;
-            const prompt = document.getElementById('prompt').value.trim();
-            const resolution = document.getElementById('resolution').value;
-            const safety_tolerance = document.getElementById('safety_tolerance').value;
-            const image_url = document.getElementById('image_url').value.trim();
+            const model = $('model').value, prompt = $('prompt').value.trim();
+            const aspectRatio = $('aspect_ratio').value, resolution = $('resolution').value;
+            const safety_tolerance = $('safety_tolerance').value, image_url = $('image_url').value.trim();
 
-            if (!prompt) {
-                alert('Please enter a prompt');
-                return;
-            }
-
-            // Check if image URL is required for image-to-image models
-            const editModels = ['flux-2-pro-edit', 'nano-banana-pro-edit'];
-            if (editModels.includes(model) && !image_url) {
-                alert('Please enter a source image URL for image editing');
-                return;
-            }
+            if (!prompt) { alert('Please enter a prompt'); return; }
+            if (['flux-2-pro-edit', 'nano-banana-pro-edit'].includes(model) && !image_url) { alert('Please enter source image URL'); return; }
 
             generateBtn.disabled = true;
-            loading.classList.add('active');
-
-            const emptyState = document.getElementById('empty-state');
-            if (emptyState) emptyState.style.display = 'none';
-
-            const prevCard = currentResult.querySelector('.result-card');
-            if (prevCard) prevCard.remove();
+            loading.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            previewArea.querySelector('.result-card')?.remove();
 
             try {
                 const payload = { model, prompt, aspectRatio };
+                if (['nano-banana-pro', 'imagen4-preview', 'nano-banana-pro-edit'].includes(model)) payload.resolution = resolution;
+                if (['flux-1.1-pro-ultra', 'flux-2-pro', 'flux-2-pro-edit'].includes(model)) payload.safety_tolerance = safety_tolerance;
+                if (image_url) payload.image_url = image_url;
 
-                // Add resolution for models that support it
-                if (model === 'nano-banana-pro' || model === 'imagen4-preview' || model === 'nano-banana-pro-edit') {
-                    payload.resolution = resolution;
-                }
+                const ctrl = new AbortController();
+                setTimeout(() => ctrl.abort(), 600000);
 
-                // Add safety tolerance for FLUX models
-                if (model === 'flux-1.1-pro-ultra' || model === 'flux-2-pro' || model === 'flux-2-pro-edit') {
-                    payload.safety_tolerance = safety_tolerance;
-                }
-
-                // Add image URL for image-to-image models
-                if (image_url) {
-                    payload.image_url = image_url;
-                }
-
-                // 设置 10 分钟超时
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 600000);
-
-                try {
-                    const response = await fetch('/api/generate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload),
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
-
-                    if (!response.ok) {
-                        if (response.status === 401) {
-                            window.location.href = '/login.html';
-                            return;
-                        }
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || 'Generation failed');
-                    }
-
-                    const data = await response.json();
-                    renderCard(data, currentResult, false);
-                } catch (fetchError) {
-                    clearTimeout(timeoutId);
-                    // 如果是网络超时或连接断开，检查 Gallery 是否有新图片
-                    if (fetchError.name === 'AbortError' || fetchError.message.includes('<!DOCTYPE') || fetchError.message.includes('Failed to fetch')) {
-                        console.log('Request may have timed out, checking gallery...');
-                        await new Promise(r => setTimeout(r, 3000));
-                        await loadGallery();
-                        alert('请求可能超时，但图片可能已生成成功，请检查 Gallery');
-                    } else {
-                        throw fetchError;
-                    }
-                }
-
-            } catch (error) {
-                console.error(error);
-                alert('Error: ' + error.message);
-                if (emptyState) emptyState.style.display = 'flex';
+                const res = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: ctrl.signal });
+                if (!res.ok) { if (res.status === 401) { location.href = '/login.html'; return; } throw new Error((await res.json()).error || 'Failed'); }
+                
+                const data = await res.json();
+                renderPreview(data);
+            } catch (e) {
+                console.error(e);
+                if (e.name === 'AbortError') { await loadGallery(); alert('请求超时，请检查 Gallery'); }
+                else { alert('Error: ' + e.message); emptyState.classList.remove('hidden'); }
             } finally {
                 generateBtn.disabled = false;
-                loading.classList.remove('active');
+                loading.classList.add('hidden');
             }
         });
 
-        // Add Manual Image
+        function renderPreview(data) {
+            const url = data.lskyUrl || data.url;
+            const card = document.createElement('div');
+            card.className = 'result-card w-full h-full flex flex-col animate-fade-in';
+            card.innerHTML = `
+                <div class="flex-1 flex items-center justify-center p-4 bg-dark-900/50">
+                    <img src="${url}" alt="Generated" class="max-w-full max-h-[400px] object-contain rounded-xl shadow-2xl">
+                </div>
+                <div class="p-4 border-t border-white/5 space-y-3">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 text-xs font-medium bg-aurora-purple/20 text-aurora-purple rounded-full">${data.model}</span>
+                        <span class="px-3 py-1 text-xs font-medium bg-white/10 text-zinc-300 rounded-full">${data.aspectRatio}</span>
+                    </div>
+                    <p class="text-sm text-zinc-400 line-clamp-2">${data.prompt}</p>
+                    <div class="flex gap-2">
+                        <button onclick="copyText('${data.prompt.replace(/'/g, "\\'")}')" class="flex-1 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm cursor-pointer transition-colors">Copy Prompt</button>
+                        <a href="${url}" target="_blank" class="flex-1 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm flex items-center justify-center transition-colors">Open</a>
+                    </div>
+                </div>
+            `;
+            previewArea.appendChild(card);
+        }
+
+        // Add Manual
         addManualBtn.addEventListener('click', async () => {
-            const url = document.getElementById('manual-url').value.trim();
-            const prompt = document.getElementById('manual-prompt').value.trim();
-            const model = document.getElementById('manual-model').value.trim();
-            const aspectRatio = document.getElementById('manual-aspect').value;
-
-            if (!url || !prompt) {
-                alert('Please enter both image URL and prompt');
-                return;
-            }
-
+            const url = $('manual-url').value.trim(), prompt = $('manual-prompt').value.trim();
+            const model = $('manual-model').value.trim(), aspectRatio = $('manual-aspect').value;
+            if (!url || !prompt) { alert('Please enter URL and prompt'); return; }
             addManualBtn.disabled = true;
-
             try {
-                const response = await fetch('/api/images/manual', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url, prompt, model, aspectRatio })
-                });
-
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        window.location.href = '/login.html';
-                        return;
-                    }
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Failed to add image');
-                }
-
-                const data = await response.json();
-
-                // Clear form
-                document.getElementById('manual-url').value = '';
-                document.getElementById('manual-prompt').value = '';
-                document.getElementById('manual-model').value = '';
-                document.getElementById('manual-aspect').value = '';
-
-                // Reload collection
-                loadCollection();
-                alert('Image added successfully!');
-
-            } catch (error) {
-                console.error(error);
-                alert('Error: ' + error.message);
-            } finally {
-                addManualBtn.disabled = false;
-            }
+                const res = await fetch('/api/images/manual', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, prompt, model, aspectRatio }) });
+                if (!res.ok) { if (res.status === 401) { location.href = '/login.html'; return; } throw new Error((await res.json()).error); }
+                $('manual-url').value = ''; $('manual-prompt').value = ''; $('manual-model').value = ''; $('manual-aspect').value = '';
+                loadCollection(); alert('Added!');
+            } catch (e) { alert('Error: ' + e.message); }
+            finally { addManualBtn.disabled = false; }
         });
 
         // Add Video
         addVideoBtn.addEventListener('click', async () => {
-            const videoType = document.getElementById('video-type').value;
-            const url = document.getElementById('video-url').value.trim();
-            const sourceImageUrl = document.getElementById('video-source-image').value.trim();
-            const prompt = document.getElementById('video-prompt').value.trim();
-            const model = document.getElementById('video-model').value.trim();
-            const aspectRatio = document.getElementById('video-aspect').value;
-
-            if (!url) {
-                alert('Please enter video URL');
-                return;
-            }
-
-            if (videoType === 'text-to-video' && !prompt) {
-                alert('Please enter prompt for text-to-video');
-                return;
-            }
-
-            if (videoType === 'image-to-video' && !sourceImageUrl) {
-                alert('Please enter source image URL for image-to-video');
-                return;
-            }
-
+            const type = $('video-type').value, url = $('video-url').value.trim();
+            const sourceImageUrl = $('video-source-image').value.trim(), prompt = $('video-prompt').value.trim();
+            const model = $('video-model').value.trim(), aspectRatio = $('video-aspect').value;
+            if (!url) { alert('Please enter video URL'); return; }
+            if (type === 'text-to-video' && !prompt) { alert('Please enter prompt'); return; }
+            if (type === 'image-to-video' && !sourceImageUrl) { alert('Please enter source image'); return; }
             addVideoBtn.disabled = true;
-
             try {
-                const endpoint = videoType === 'text-to-video' 
-                    ? '/api/videos/text-to-video' 
-                    : '/api/videos/image-to-video';
-
-                const payload = videoType === 'text-to-video'
-                    ? { url, prompt, model, aspectRatio }
-                    : { url, sourceImageUrl, prompt, model, aspectRatio };
-
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        window.location.href = '/login.html';
-                        return;
-                    }
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Failed to add video');
-                }
-
-                // Clear form
-                document.getElementById('video-url').value = '';
-                document.getElementById('video-source-image').value = '';
-                document.getElementById('video-prompt').value = '';
-                document.getElementById('video-model').value = '';
-                document.getElementById('video-aspect').value = '';
-
-                // Reload videos
-                loadVideos();
-                alert('Video added successfully!');
-
-            } catch (error) {
-                console.error(error);
-                alert('Error: ' + error.message);
-            } finally {
-                addVideoBtn.disabled = false;
-            }
+                const endpoint = type === 'text-to-video' ? '/api/videos/text-to-video' : '/api/videos/image-to-video';
+                const payload = type === 'text-to-video' ? { url, prompt, model, aspectRatio } : { url, sourceImageUrl, prompt, model, aspectRatio };
+                const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!res.ok) { if (res.status === 401) { location.href = '/login.html'; return; } throw new Error((await res.json()).error); }
+                $('video-url').value = ''; $('video-source-image').value = ''; $('video-prompt').value = ''; $('video-model').value = ''; $('video-aspect').value = '';
+                loadVideos(); alert('Added!');
+            } catch (e) { alert('Error: ' + e.message); }
+            finally { addVideoBtn.disabled = false; }
         });
 
+        // Load functions
         async function loadGallery() {
-            galleryView.innerHTML = '<div class="loading active"><div class="spinner"></div><p>Loading gallery...</p></div>';
+            galleryGrid.innerHTML = '<div class="col-span-full flex justify-center py-20"><div class="w-10 h-10 rounded-full border-2 border-aurora-purple/20 border-t-aurora-purple animate-spin"></div></div>';
             try {
-                const response = await fetch('/api/images');
-                if (response.status === 401) {
-                    window.location.href = '/login.html';
-                    return;
-                }
-                const images = await response.json();
-                galleryView.innerHTML = '';
-
-                if (images.length === 0) {
-                    galleryView.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: var(--text-secondary);">No images generated yet.</p>';
-                    return;
-                }
-
-                // Filter auto-generated images
-                const autoImages = images.filter(img => img.source !== 'manual');
-                autoImages.forEach(img => renderCard(img, galleryView, true));
-            } catch (error) {
-                console.error(error);
-                galleryView.innerHTML = '<p style="color: var(--danger-color);">Failed to load gallery.</p>';
-            }
+                const res = await fetch('/api/images');
+                if (res.status === 401) { location.href = '/login.html'; return; }
+                const images = (await res.json()).filter(i => i.source !== 'manual');
+                galleryGrid.innerHTML = images.length ? '' : '<p class="col-span-full text-center text-zinc-500 py-20">No images yet</p>';
+                images.forEach(img => renderCard(img, galleryGrid));
+            } catch (e) { galleryGrid.innerHTML = '<p class="col-span-full text-center text-red-400 py-20">Failed to load</p>'; }
         }
 
         async function loadCollection() {
-            collectionGallery.innerHTML = '<div class="loading active"><div class="spinner"></div><p>Loading collection...</p></div>';
+            collectionGallery.innerHTML = '<div class="col-span-full flex justify-center py-20"><div class="w-10 h-10 rounded-full border-2 border-aurora-purple/20 border-t-aurora-purple animate-spin"></div></div>';
             try {
-                const response = await fetch('/api/images');
-                if (response.status === 401) {
-                    window.location.href = '/login.html';
-                    return;
-                }
-                const images = await response.json();
-                collectionGallery.innerHTML = '';
-
-                // Filter manual images
-                const manualImages = images.filter(img => img.source === 'manual');
-
-                if (manualImages.length === 0) {
-                    collectionGallery.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: var(--text-secondary);">No manual collection yet.</p>';
-                    return;
-                }
-
-                manualImages.forEach(img => renderCard(img, collectionGallery, true));
-            } catch (error) {
-                console.error(error);
-                collectionGallery.innerHTML = '<p style="color: var(--danger-color);">Failed to load collection.</p>';
-            }
+                const res = await fetch('/api/images');
+                if (res.status === 401) { location.href = '/login.html'; return; }
+                const images = (await res.json()).filter(i => i.source === 'manual');
+                collectionGallery.innerHTML = images.length ? '' : '<p class="col-span-full text-center text-zinc-500 py-20">No collection yet</p>';
+                images.forEach(img => renderCard(img, collectionGallery));
+            } catch (e) { collectionGallery.innerHTML = '<p class="col-span-full text-center text-red-400 py-20">Failed to load</p>'; }
         }
 
         async function loadVideos() {
-            videoGallery.innerHTML = '<div class="loading active"><div class="spinner"></div><p>Loading videos...</p></div>';
+            videoGallery.innerHTML = '<div class="col-span-full flex justify-center py-20"><div class="w-10 h-10 rounded-full border-2 border-aurora-purple/20 border-t-aurora-purple animate-spin"></div></div>';
             try {
-                const response = await fetch('/api/videos');
-                if (response.status === 401) {
-                    window.location.href = '/login.html';
-                    return;
-                }
-                const videos = await response.json();
-                videoGallery.innerHTML = '';
-
-                if (videos.length === 0) {
-                    videoGallery.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: var(--text-secondary);">No videos collected yet.</p>';
-                    return;
-                }
-
-                videos.forEach(video => renderVideoCard(video, videoGallery));
-            } catch (error) {
-                console.error(error);
-                videoGallery.innerHTML = '<p style="color: var(--danger-color);">Failed to load videos.</p>';
-            }
+                const res = await fetch('/api/videos');
+                if (res.status === 401) { location.href = '/login.html'; return; }
+                const videos = await res.json();
+                videoGallery.innerHTML = videos.length ? '' : '<p class="col-span-full text-center text-zinc-500 py-20">No videos yet</p>';
+                videos.forEach(v => renderVideoCard(v, videoGallery));
+            } catch (e) { videoGallery.innerHTML = '<p class="col-span-full text-center text-red-400 py-20">Failed to load</p>'; }
         }
 
-        function renderVideoCard(data, container) {
+        function renderCard(data, container) {
+            const url = data.lskyUrl || data.url;
+            const date = new Date(data.timestamp);
             const card = document.createElement('div');
-            card.className = 'result-card';
+            card.className = 'group bg-dark-800/50 rounded-2xl border border-white/5 overflow-hidden card-hover cursor-pointer animate-fade-in';
             card.id = `card-${data.id}`;
-
-            const safePrompt = (data.prompt || '').replace(/"/g, '&quot;');
-            const typeLabel = data.type === 'text-to-video' ? 'T2V' : 'I2V';
-            const typeFull = data.type === 'text-to-video' ? '文生视频' : '图生视频';
-
-            // Format date and time
-            const dateObj = new Date(data.timestamp);
-            const dateStr = dateObj.toLocaleDateString('zh-CN');
-            const timeStr = dateObj.toLocaleTimeString('zh-CN');
-
-            let sourceImageHtml = '';
-            if (data.type === 'image-to-video' && data.sourceImageUrl) {
-                sourceImageHtml = `
-                    <div class="source-image-row">
-                        <span class="source-image-label">Source:</span>
-                        <img src="${data.sourceImageUrl}" alt="Source Image" class="source-image-preview" onclick="window.open('${data.sourceImageUrl}', '_blank')">
-                    </div>
-                `;
-            }
-
             card.innerHTML = `
-                <div class="video-container">
-                    <span class="video-type-badge">${typeLabel} ${typeFull}</span>
-                    <video controls preload="metadata">
-                        <source src="${data.url}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                <div class="aspect-square overflow-hidden bg-dark-900">
+                    <img src="${url}" alt="Image" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                 </div>
-                <div class="image-details">
-                    <div class="meta-info">
-                        <span class="meta-tag">${data.model}</span>
-                        <span class="meta-tag">${data.aspectRatio}</span>
-                        <span class="meta-tag">${dateStr} ${timeStr}</span>
+                <div class="p-4 space-y-3">
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="px-2 py-0.5 text-[10px] font-medium bg-aurora-purple/20 text-aurora-purple rounded">${data.model}</span>
+                        <span class="px-2 py-0.5 text-[10px] font-medium bg-white/10 text-zinc-400 rounded">${data.aspectRatio}</span>
                     </div>
-                    ${sourceImageHtml}
-                    ${data.prompt ? `<p class="prompt-text">${data.prompt}</p>` : ''}
-                    <div class="actions">
-                        ${data.prompt ? `<button class="action-btn" onclick="copyVideoPrompt(this)">Copy Prompt</button>` : ''}
-                        <a href="${data.url}" target="_blank" class="action-btn">Open</a>
-                        <button class="action-btn danger" onclick="deleteVideo('${data.id}')">Delete</button>
+                    <p class="text-xs text-zinc-500 line-clamp-2">${data.prompt}</p>
+                    <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                        <span class="text-[10px] text-zinc-600">${date.toLocaleDateString('zh-CN')}</span>
+                        <div class="flex gap-1">
+                            <button onclick="copyText(\`${data.prompt.replace(/`/g, '\\`')}\`)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer" title="Copy">
+                                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+                            </button>
+                            <a href="${url}" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors" title="Open">
+                                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                            </a>
+                            <button onclick="deleteImage('${data.id}')" class="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center transition-colors cursor-pointer" title="Delete">
+                                <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <input type="hidden" class="prompt-value" value="${safePrompt}">
             `;
-
             container.appendChild(card);
         }
 
-        function copyVideoPrompt(btn) {
-            const card = btn.closest('.result-card');
-            const promptInput = card.querySelector('.prompt-value');
-            const text = promptInput.value;
-
-            navigator.clipboard.writeText(text).then(() => {
-                const originalText = btn.innerText;
-                btn.innerText = 'Copied!';
-                setTimeout(() => btn.innerText = originalText, 2000);
-            });
-        }
-
-        async function deleteVideo(id) {
-            if (!confirm('Are you sure you want to delete this video?')) return;
-
-            try {
-                const response = await fetch(`/api/videos/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    const card = document.getElementById(`card-${id}`);
-                    if (card) card.remove();
-                } else {
-                    alert('Failed to delete video');
-                }
-            } catch (error) {
-                console.error(error);
-                alert('Error deleting video');
-            }
-        }
-
-        function renderCard(data, container, isGallery) {
+        function renderVideoCard(data, container) {
+            const date = new Date(data.timestamp);
+            const typeLabel = data.type === 'text-to-video' ? 'T2V' : 'I2V';
             const card = document.createElement('div');
-            card.className = 'result-card';
+            card.className = 'group bg-dark-800/50 rounded-2xl border border-white/5 overflow-hidden card-hover animate-fade-in';
             card.id = `card-${data.id}`;
-
-            // Prefer Lsky URL, fallback to original URL
-            const displayUrl = data.lskyUrl || data.url;
-            const safePrompt = data.prompt.replace(/"/g, '&quot;');
-
-            let deleteBtn = '';
-            if (isGallery) {
-                deleteBtn = `<button class="action-btn danger" onclick="deleteImage('${data.id}')">Delete</button>`;
-            }
-
-            // Format date and time
-            const dateObj = new Date(data.timestamp);
-            const dateStr = dateObj.toLocaleDateString('zh-CN');
-            const timeStr = dateObj.toLocaleTimeString('zh-CN');
-
             card.innerHTML = `
-                <div class="image-container">
-                    <img src="${displayUrl}" alt="Generated Image" loading="lazy">
+                <div class="relative bg-black">
+                    <span class="absolute top-3 left-3 z-10 px-2 py-1 text-[10px] font-bold bg-gradient-to-r from-aurora-purple to-aurora-pink text-white rounded">${typeLabel}</span>
+                    <video controls preload="metadata" class="w-full aspect-video object-contain"><source src="${data.url}" type="video/mp4"></video>
                 </div>
-                <div class="image-details">
-                    <div class="meta-info">
-                        <span class="meta-tag">${data.model}</span>
-                        <span class="meta-tag">${data.aspectRatio}</span>
-                        ${data.resolution ? `<span class="meta-tag">${data.resolution}</span>` : ''}
-                        <span class="meta-tag">${dateStr} ${timeStr}</span>
+                <div class="p-4 space-y-3">
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="px-2 py-0.5 text-[10px] font-medium bg-aurora-purple/20 text-aurora-purple rounded">${data.model || 'Unknown'}</span>
+                        <span class="px-2 py-0.5 text-[10px] font-medium bg-white/10 text-zinc-400 rounded">${data.aspectRatio || '-'}</span>
                     </div>
-                    <p class="prompt-text">${data.prompt}</p>
-                    <div class="actions">
-                        <button class="action-btn" onclick="copyPrompt(this)">Copy Prompt</button>
-                        <a href="${displayUrl}" target="_blank" class="action-btn">Open</a>
-                        ${deleteBtn}
+                    ${data.prompt ? `<p class="text-xs text-zinc-500 line-clamp-2">${data.prompt}</p>` : ''}
+                    <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                        <span class="text-[10px] text-zinc-600">${date.toLocaleDateString('zh-CN')}</span>
+                        <div class="flex gap-1">
+                            ${data.prompt ? `<button onclick="copyText(\`${data.prompt.replace(/`/g, '\\`')}\`)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer"><svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg></button>` : ''}
+                            <a href="${data.url}" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"><svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg></a>
+                            <button onclick="deleteVideo('${data.id}')" class="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center transition-colors cursor-pointer"><svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                        </div>
                     </div>
                 </div>
-                <input type="hidden" class="prompt-value" value="${safePrompt}">
             `;
-
-            if (container === currentResult) {
-                container.insertBefore(card, loading.nextSibling);
-            } else {
-                container.appendChild(card);
-            }
+            container.appendChild(card);
         }
 
-        function copyPrompt(btn) {
-            const card = btn.closest('.result-card');
-            const promptInput = card.querySelector('.prompt-value');
-            const text = promptInput.value;
-
-            navigator.clipboard.writeText(text).then(() => {
-                const originalText = btn.innerText;
-                btn.innerText = 'Copied!';
-                setTimeout(() => btn.innerText = originalText, 2000);
-            });
-        }
-
-        async function deleteImage(id) {
-            if (!confirm('Are you sure you want to delete this image?')) return;
-
-            try {
-                const response = await fetch(`/api/images/${id}`, { method: 'DELETE' });
-                if (response.ok) {
-                    const card = document.getElementById(`card-${id}`);
-                    if (card) card.remove();
-                } else {
-                    alert('Failed to delete image');
-                }
-            } catch (error) {
-                console.error(error);
-                alert('Error deleting image');
-            }
-        }
+        // Utilities
+        function copyText(text) { navigator.clipboard.writeText(text).then(() => alert('Copied!')); }
+        async function deleteImage(id) { if (!confirm('Delete this image?')) return; try { const res = await fetch(`/api/images/${id}`, { method: 'DELETE' }); if (res.ok) $(`card-${id}`)?.remove(); } catch (e) { alert('Error'); } }
+        async function deleteVideo(id) { if (!confirm('Delete this video?')) return; try { const res = await fetch(`/api/videos/${id}`, { method: 'DELETE' }); if (res.ok) $(`card-${id}`)?.remove(); } catch (e) { alert('Error'); } }
     </script>
 </body>
-
 </html>
