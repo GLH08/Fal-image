@@ -367,23 +367,81 @@
             previewArea.querySelector('.result-card')?.remove();
 
             try {
-                const payload = { model, prompt, aspectRatio };
+                const payload = { model, prompt, aspectRatio, async: true }; // Enable async mode
                 if (['nano-banana-pro', 'imagen4-preview', 'nano-banana-pro-edit'].includes(model)) payload.resolution = resolution;
                 if (['flux-1.1-pro-ultra', 'flux-2-pro', 'flux-2-pro-edit'].includes(model)) payload.safety_tolerance = safety_tolerance;
                 if (image_url) payload.image_url = image_url;
 
-                const ctrl = new AbortController();
-                setTimeout(() => ctrl.abort(), 600000);
-
-                const res = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: ctrl.signal });
-                if (!res.ok) { if (res.status === 401) { location.href = '/login.html'; return; } throw new Error((await res.json()).error || 'Failed'); }
+                // Submit request
+                const res = await fetch('/api/generate', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload)
+                });
                 
-                const data = await res.json();
-                renderPreview(data);
+                if (!res.ok) {
+                    if (res.status === 401) { location.href = '/login.html'; return; }
+                    const contentType = res.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        const errData = await res.json();
+                        throw new Error(errData.error || `Request failed: ${res.status}`);
+                    }
+                    throw new Error(`服务器错误: ${res.status}`);
+                }
+                
+                const submitData = await res.json();
+                
+                // If we got a direct result (sync mode fallback)
+                if (submitData.url) {
+                    renderPreview(submitData);
+                    return;
+                }
+                
+                // Async mode: poll for result
+                const requestId = submitData.requestId;
+                if (!requestId) throw new Error('No requestId returned');
+                
+                // Poll for completion (max 10 minutes)
+                const maxPolls = 600;
+                for (let i = 0; i < maxPolls; i++) {
+                    await new Promise(r => setTimeout(r, 2000)); // Poll every 2 seconds
+                    
+                    const statusRes = await fetch(`/api/generate/status/${requestId}?model=${model}`);
+                    if (!statusRes.ok) continue;
+                    
+                    const statusData = await statusRes.json();
+                    
+                    if (statusData.status === 'completed') {
+                        // Build result object
+                        const result = {
+                            id: requestId,
+                            url: statusData.url,
+                            lskyUrl: statusData.lskyUrl,
+                            prompt: prompt,
+                            model: model,
+                            aspectRatio: aspectRatio,
+                            resolution: resolution
+                        };
+                        renderPreview(result);
+                        
+                        // Reload gallery to show new image
+                        loadGallery();
+                        return;
+                    }
+                    
+                    if (statusData.status === 'failed') {
+                        throw new Error(statusData.error || 'Generation failed');
+                    }
+                    
+                    // Still processing, continue polling
+                }
+                
+                throw new Error('生成超时，请检查 Gallery');
+                
             } catch (e) {
                 console.error(e);
-                if (e.name === 'AbortError') { await loadGallery(); alert('请求超时，请检查 Gallery'); }
-                else { alert('Error: ' + e.message); emptyState.classList.remove('hidden'); }
+                alert('Error: ' + e.message);
+                emptyState.classList.remove('hidden');
             } finally {
                 generateBtn.disabled = false;
                 loading.classList.add('hidden');

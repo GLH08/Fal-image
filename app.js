@@ -498,7 +498,7 @@ app.get('/api/models', (req, res) => {
     res.json(models);
 });
 
-// Generate Image Endpoint
+// Generate Image Endpoint - Async mode to avoid Cloudflare timeout
 app.post('/api/generate', async (req, res) => {
     if (!FAL_KEY) {
         return res.status(500).json({ error: "Server missing FAL_KEY configuration." });
@@ -519,7 +519,8 @@ app.post('/api/generate', async (req, res) => {
         raw,
         imagePromptStrength,
         imageSize,
-        enableSafetyChecker
+        enableSafetyChecker,
+        async: asyncMode  // New: support async mode
     } = req.body;
 
     if (!model || !FAL_MODEL_CONFIG[model]) {
@@ -582,9 +583,21 @@ app.post('/api/generate', async (req, res) => {
         const submitResult = await submitResponse.json();
         const requestId = submitResult.request_id;
 
-        // Poll for Result
+        // If async mode, return request_id immediately for client-side polling
+        if (asyncMode) {
+            return res.json({ 
+                requestId, 
+                status: 'processing',
+                model,
+                prompt,
+                aspectRatio: aspectRatio || config.defaults.aspectRatio,
+                resolution: resolution || config.defaults.resolution
+            });
+        }
+
+        // Sync mode: Poll for Result (with shorter timeout to avoid Cloudflare 524)
         let result = null;
-        const maxAttempts = 600;  // Increased to 600 seconds (10 minutes)
+        const maxAttempts = 90;  // 90 seconds max to stay under Cloudflare's 100s timeout
         for (let i = 0; i < maxAttempts; i++) {
             await new Promise(r => setTimeout(r, 1000));
 
@@ -650,6 +663,74 @@ app.post('/api/generate', async (req, res) => {
 
     } catch (error) {
         console.error("Generation error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Check generation status - for async polling
+app.get('/api/generate/status/:requestId', async (req, res) => {
+    if (!FAL_KEY) {
+        return res.status(500).json({ error: "Server missing FAL_KEY configuration." });
+    }
+
+    const { requestId } = req.params;
+    const { model } = req.query;
+
+    if (!requestId) {
+        return res.status(400).json({ error: "Missing requestId" });
+    }
+
+    const config = FAL_MODEL_CONFIG[model] || FAL_MODEL_CONFIG['flux-1.1-pro-ultra'];
+
+    try {
+        const statusUrl = `${config.statusBaseUrl}/requests/${requestId}`;
+        const statusResponse = await fetch(statusUrl, {
+            headers: { 'Authorization': `Key ${FAL_KEY}` }
+        });
+
+        if (statusResponse.status === 200) {
+            const data = await statusResponse.json();
+            
+            if (data.images && data.images.length > 0) {
+                // Generation complete
+                let falUrl = data.images[0].url;
+                if (falUrl && falUrl.startsWith('http://')) {
+                    falUrl = falUrl.replace('http://', 'https://');
+                }
+
+                // Try to upload to Lsky
+                let lskyUrl = null;
+                if (process.env.LSKY_URL && process.env.LSKY_TOKEN) {
+                    try {
+                        lskyUrl = await uploadToLsky(falUrl);
+                    } catch (e) {
+                        console.error("Lsky upload failed", e);
+                    }
+                }
+
+                return res.json({
+                    status: 'completed',
+                    url: falUrl,
+                    lskyUrl: lskyUrl,
+                    width: data.images[0].width,
+                    height: data.images[0].height
+                });
+            }
+            
+            if (data.status === 'FAILED' || data.status === 'CANCELLED') {
+                return res.json({ status: 'failed', error: `Generation ${data.status}` });
+            }
+
+            // Still processing
+            return res.json({ status: 'processing' });
+        }
+
+        // Request not found or other error
+        const statusData = await statusResponse.json().catch(() => ({}));
+        return res.json({ status: 'processing', detail: statusData });
+
+    } catch (error) {
+        console.error("Status check error:", error);
         res.status(500).json({ error: error.message });
     }
 });
