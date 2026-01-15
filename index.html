@@ -394,22 +394,24 @@
             const url = data.lskyUrl || data.url;
             const card = document.createElement('div');
             card.className = 'result-card w-full h-full flex flex-col animate-fade-in';
+            card.dataset.prompt = data.prompt;
             card.innerHTML = `
                 <div class="flex-1 flex items-center justify-center p-4 bg-dark-900/50">
                     <img src="${url}" alt="Generated" class="max-w-full max-h-[400px] object-contain rounded-xl shadow-2xl">
                 </div>
                 <div class="p-4 border-t border-white/5 space-y-3">
                     <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 text-xs font-medium bg-aurora-purple/20 text-aurora-purple rounded-full">${data.model}</span>
-                        <span class="px-3 py-1 text-xs font-medium bg-white/10 text-zinc-300 rounded-full">${data.aspectRatio}</span>
+                        <span class="px-3 py-1 text-xs font-medium bg-aurora-purple/20 text-aurora-purple rounded-full">${escapeHtml(data.model)}</span>
+                        <span class="px-3 py-1 text-xs font-medium bg-white/10 text-zinc-300 rounded-full">${escapeHtml(data.aspectRatio)}</span>
                     </div>
-                    <p class="text-sm text-zinc-400 line-clamp-2">${data.prompt}</p>
+                    <p class="text-sm text-zinc-400 line-clamp-2">${escapeHtml(data.prompt)}</p>
                     <div class="flex gap-2">
-                        <button onclick="copyText('${data.prompt.replace(/'/g, "\\'")}')" class="flex-1 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm cursor-pointer transition-colors">Copy Prompt</button>
+                        <button class="copy-btn flex-1 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm cursor-pointer transition-colors">Copy Prompt</button>
                         <a href="${url}" target="_blank" class="flex-1 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm flex items-center justify-center transition-colors">Open</a>
                     </div>
                 </div>
             `;
+            card.querySelector('.copy-btn').addEventListener('click', () => copyToClipboard(data.prompt));
             previewArea.appendChild(card);
         }
 
@@ -488,32 +490,36 @@
             const card = document.createElement('div');
             card.className = 'group bg-dark-800/50 rounded-2xl border border-white/5 overflow-hidden card-hover cursor-pointer animate-fade-in';
             card.id = `card-${data.id}`;
+            card.dataset.prompt = data.prompt; // Store prompt in data attribute
             card.innerHTML = `
                 <div class="aspect-square overflow-hidden bg-dark-900">
                     <img src="${url}" alt="Image" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                 </div>
                 <div class="p-4 space-y-3">
                     <div class="flex flex-wrap gap-1.5">
-                        <span class="px-2 py-0.5 text-[10px] font-medium bg-aurora-purple/20 text-aurora-purple rounded">${data.model}</span>
-                        <span class="px-2 py-0.5 text-[10px] font-medium bg-white/10 text-zinc-400 rounded">${data.aspectRatio}</span>
+                        <span class="px-2 py-0.5 text-[10px] font-medium bg-aurora-purple/20 text-aurora-purple rounded">${escapeHtml(data.model)}</span>
+                        <span class="px-2 py-0.5 text-[10px] font-medium bg-white/10 text-zinc-400 rounded">${escapeHtml(data.aspectRatio)}</span>
                     </div>
-                    <p class="text-xs text-zinc-500 line-clamp-2">${data.prompt}</p>
+                    <p class="text-xs text-zinc-500 line-clamp-2">${escapeHtml(data.prompt)}</p>
                     <div class="flex items-center justify-between pt-2 border-t border-white/5">
                         <span class="text-[10px] text-zinc-600">${date.toLocaleDateString('zh-CN')}</span>
                         <div class="flex gap-1">
-                            <button onclick="copyText(\`${data.prompt.replace(/`/g, '\\`')}\`)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer" title="Copy">
+                            <button class="copy-btn w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer" title="Copy">
                                 <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
                             </button>
                             <a href="${url}" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors" title="Open">
                                 <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
                             </a>
-                            <button onclick="deleteImage('${data.id}')" class="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center transition-colors cursor-pointer" title="Delete">
+                            <button class="delete-img-btn w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center transition-colors cursor-pointer" data-id="${data.id}" title="Delete">
                                 <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
                             </button>
                         </div>
                     </div>
                 </div>
             `;
+            // Add event listeners
+            card.querySelector('.copy-btn').addEventListener('click', (e) => { e.stopPropagation(); copyToClipboard(data.prompt); });
+            card.querySelector('.delete-img-btn').addEventListener('click', (e) => { e.stopPropagation(); deleteImage(data.id); });
             container.appendChild(card);
         }
 
@@ -523,6 +529,7 @@
             const card = document.createElement('div');
             card.className = 'group bg-dark-800/50 rounded-2xl border border-white/5 overflow-hidden card-hover animate-fade-in';
             card.id = `card-${data.id}`;
+            card.dataset.prompt = data.prompt || '';
             card.innerHTML = `
                 <div class="relative bg-black">
                     <span class="absolute top-3 left-3 z-10 px-2 py-1 text-[10px] font-bold bg-gradient-to-r from-aurora-purple to-aurora-pink text-white rounded">${typeLabel}</span>
@@ -530,25 +537,44 @@
                 </div>
                 <div class="p-4 space-y-3">
                     <div class="flex flex-wrap gap-1.5">
-                        <span class="px-2 py-0.5 text-[10px] font-medium bg-aurora-purple/20 text-aurora-purple rounded">${data.model || 'Unknown'}</span>
-                        <span class="px-2 py-0.5 text-[10px] font-medium bg-white/10 text-zinc-400 rounded">${data.aspectRatio || '-'}</span>
+                        <span class="px-2 py-0.5 text-[10px] font-medium bg-aurora-purple/20 text-aurora-purple rounded">${escapeHtml(data.model || 'Unknown')}</span>
+                        <span class="px-2 py-0.5 text-[10px] font-medium bg-white/10 text-zinc-400 rounded">${escapeHtml(data.aspectRatio || '-')}</span>
                     </div>
-                    ${data.prompt ? `<p class="text-xs text-zinc-500 line-clamp-2">${data.prompt}</p>` : ''}
+                    ${data.prompt ? `<p class="text-xs text-zinc-500 line-clamp-2">${escapeHtml(data.prompt)}</p>` : ''}
                     <div class="flex items-center justify-between pt-2 border-t border-white/5">
                         <span class="text-[10px] text-zinc-600">${date.toLocaleDateString('zh-CN')}</span>
                         <div class="flex gap-1">
-                            ${data.prompt ? `<button onclick="copyText(\`${data.prompt.replace(/`/g, '\\`')}\`)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer"><svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg></button>` : ''}
+                            ${data.prompt ? `<button class="copy-btn w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer"><svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg></button>` : ''}
                             <a href="${data.url}" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"><svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg></a>
-                            <button onclick="deleteVideo('${data.id}')" class="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center transition-colors cursor-pointer"><svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                            <button class="delete-video-btn w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center transition-colors cursor-pointer" data-id="${data.id}"><svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
                         </div>
                     </div>
                 </div>
             `;
+            // Add event listeners
+            const copyBtn = card.querySelector('.copy-btn');
+            if (copyBtn) copyBtn.addEventListener('click', (e) => { e.stopPropagation(); copyToClipboard(data.prompt); });
+            card.querySelector('.delete-video-btn').addEventListener('click', (e) => { e.stopPropagation(); deleteVideo(data.id); });
             container.appendChild(card);
         }
 
         // Utilities
-        function copyText(text) { navigator.clipboard.writeText(text).then(() => alert('Copied!')); }
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show brief feedback
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-4 right-4 bg-aurora-purple text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in';
+                toast.textContent = 'Copied!';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 1500);
+            }).catch(() => alert('Failed to copy'));
+        }
         async function deleteImage(id) { if (!confirm('Delete this image?')) return; try { const res = await fetch(`/api/images/${id}`, { method: 'DELETE' }); if (res.ok) $(`card-${id}`)?.remove(); } catch (e) { alert('Error'); } }
         async function deleteVideo(id) { if (!confirm('Delete this video?')) return; try { const res = await fetch(`/api/videos/${id}`, { method: 'DELETE' }); if (res.ok) $(`card-${id}`)?.remove(); } catch (e) { alert('Error'); } }
     </script>

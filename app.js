@@ -413,6 +413,11 @@ function constructFalPayload(model, params) {
         if (params.imagePromptStrength) {
             payload.image_prompt_strength = params.imagePromptStrength;
         }
+
+        // nano-banana-pro-edit supports resolution parameter
+        if (model === 'nano-banana-pro-edit' && params.resolution && config.supports.resolutions.length > 0) {
+            payload.resolution = params.resolution;
+        }
     } else {
         // Text-to-image models
         if (model === 'flux-2-pro') {
