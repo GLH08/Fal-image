@@ -144,5 +144,81 @@ Content-Type: application/json
 - `PATCH /api/images/:id/hide` / `PATCH /api/videos/:id/hide` - 将某生成结果对访客画廊做强屏蔽
 - `DELETE /api/images/:id` - 执行媒体资源和记录的永久删除
 
+## 🛡️ Nginx 反代配置 (适配 Cloudflare)
+
+如果你计划绑定自己的域名并套用 **Cloudflare** 加速，我们强烈推荐使用以下 Nginx 配置文件。该配置已经解决并优化了以下痛点：
+1. **真实请求 IP 透传**：提取 `$http_cf_connecting_ip` 防止速率限制误伤。
+2. **大文件与生图超时问题**：充分容忍长时间的请求不断流（注意：Cloudflare 免费版强制超时断点为 100秒，若生视频持续超过100秒可能触发 524 错误，此时建议关闭小黄云代理）。
+
+```nginx
+server {
+    listen 80;
+    server_name example.com; # ❗修改为你自己的域名
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name example.com; # ❗修改为你自己的域名
+
+    # ❗修改为你自己的 SSL 证书地址（在 CF 模式下，推荐使用 SSL/TLS Full Strict 严格模式）
+    ssl_certificate /path/to/your/fullchain.pem;
+    ssl_certificate_key /path/to/your/privkey.pem;
+
+    # SSL 优化
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # 安全头
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # 请求体大小（支持图片上传，受制于 CF 免费版 100M 上限）
+    client_max_body_size 50M;
+
+    # Gzip 压缩
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml image/svg+xml;
+    gzip_min_length 1000;
+
+    location / {
+        proxy_pass http://localhost:8787; # 对应 docker-compose 中暴露的端口
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        
+        # 兼容 Cloudflare 获取客户端真实 IP
+        proxy_set_header X-Real-IP $http_cf_connecting_ip;
+        proxy_set_header X-Forwarded-For $http_cf_connecting_ip;
+        
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+
+        proxy_cache_bypass $http_upgrade;
+
+        # 超时设置（图像生视频等极耗时任务容忍）
+        proxy_connect_timeout 300s;
+        proxy_send_timeout 300s;
+        proxy_read_timeout 300s;
+
+        # 禁用缓冲（实时响应有利）
+        proxy_buffering off;
+    }
+}
+
+# 需要在上一级 http 块添加：
+# map $http_upgrade $connection_upgrade {
+#     default upgrade;
+#     '' close;
+# }
+```
+
 ## 📜 License
 MIT License.
