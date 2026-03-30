@@ -1,6 +1,6 @@
 services:
   ai-studio:
-    image: ghcr.io/glh08/fal-image:latest
+    image: ghcr.io/glh08/ai-studio:latest
     container_name: ai-studio
     ports:
       - "8787:8787"

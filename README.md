@@ -2,7 +2,7 @@
 
 基于多提供商架构的专业 AI 多媒体生成平台。完美支持 OpenAI、OpenAI-Compatible、Gemini 以及 Grok2API 等多种渠道，内置高级的文生图、图生图（图像编辑）、文生视频、图生视频等全维度多媒体生成能力。
 
-[![Build and Push](https://github.com/GLH08/Fal-image/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/GLH08/Fal-image/actions/workflows/docker-publish.yml)
+[![Build and Push](https://github.com/GLH08/AI-Studio/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/GLH08/AI-Studio/actions/workflows/docker-publish.yml)
 
 ## 🌟 核心特性
 
@@ -23,8 +23,8 @@
 mkdir ai-studio && cd ai-studio
 
 # 2. 下载远程拉取版配置与环境变量模板
-curl -O https://raw.githubusercontent.com/GLH08/Fal-image/main/docker-compose.ghcr.yml
-curl -O https://raw.githubusercontent.com/GLH08/Fal-image/main/.env.example
+curl -O https://raw.githubusercontent.com/GLH08/AI-Studio/main/docker-compose.ghcr.yml
+curl -O https://raw.githubusercontent.com/GLH08/AI-Studio/main/.env.example
 
 # 3. 配置文件并填入你的参数
 cp .env.example .env
@@ -41,8 +41,8 @@ docker-compose -f docker-compose.ghcr.yml up -d
 
 ```bash
 # 克隆仓库
-git clone https://github.com/GLH08/Fal-image.git
-cd Fal-image
+git clone https://github.com/GLH08/AI-Studio.git
+cd AI-Studio
 
 # 配置环境变量
 cp .env.example .env
@@ -55,8 +55,8 @@ docker-compose up -d --build
 ### 方式三：裸机 Node.js 部署
 
 ```bash
-git clone https://github.com/GLH08/Fal-image.git
-cd Fal-image
+git clone https://github.com/GLH08/AI-Studio.git
+cd AI-Studio
 npm install
 
 # 请确保已创建并填写了 .env 文件，或通过全局 exports 暴露
