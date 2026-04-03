@@ -111,6 +111,8 @@ const limiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
 });
+// Skip rate limiting for video proxy endpoint (it streams large files)
+app.use('/api/proxy/video', (req, res, next) => next());
 app.use('/api/', limiter);
 
 // Authentication Middleware
