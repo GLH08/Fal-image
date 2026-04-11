@@ -741,7 +741,7 @@ async function callProvider(provider, params) {
 
 // ==================== Chevereto Upload Helper ====================
 
-async function uploadToChevereto(fileUrl, isVideo = false) {
+async function uploadToChevereto(fileUrl, isVideo = false, providerApiKey = null) {
     const cheveretoUrl = process.env.CHEVERETO_URL;
     const apiKey = process.env.CHEVERETO_API_KEY;
     const albumId = process.env.CHEVERETO_ALBUM_ID;
@@ -759,7 +759,12 @@ async function uploadToChevereto(fileUrl, isVideo = false) {
 
     try {
         console.log(`Downloading file from: ${fileUrl}`);
-        const response = await fetch(fileUrl);
+        const headers = {};
+        // Pass provider API key for authentication when downloading from upstream (e.g., grok2api)
+        if (providerApiKey) {
+            headers['Authorization'] = `Bearer ${providerApiKey}`;
+        }
+        const response = await fetch(fileUrl, { headers });
         if (!response.ok) throw new Error(`Failed to download file. Status: ${response.status}`);
 
         const arrayBuffer = await response.arrayBuffer();
@@ -861,10 +866,10 @@ app.post('/api/generate', async (req, res) => {
         const records = [];
 
         for (const mediaUrl of allUrls) {
-            // Upload to Chevereto
+            // Upload to Chevereto (pass provider API key for authentication when downloading)
             let cheveretoUrl = null;
             try {
-                cheveretoUrl = await uploadToChevereto(mediaUrl, isVideoResult);
+                cheveretoUrl = await uploadToChevereto(mediaUrl, isVideoResult, provider.apiKey);
             } catch (e) {
                 console.error('Chevereto upload failed', e);
             }
@@ -872,8 +877,10 @@ app.post('/api/generate', async (req, res) => {
             const id = (isVideoResult ? 'video-gen-' : 'gen-') + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 
             if (isVideoResult) {
+                // For videos: use Chevereto URL if available, otherwise use local proxy URL
+                const videoUrl = cheveretoUrl || `/api/proxy/video?url=${encodeURIComponent(mediaUrl)}`;
                 const videoRecord = {
-                    id, url: cheveretoUrl || mediaUrl, prompt, model,
+                    id, url: videoUrl, prompt, model,
                     provider: provider.name, providerType: provider.type,
                     sourceImageUrl: sourceImageUrl || null,
                     aspectRatio: videoConfig?.aspect_ratio || null,
