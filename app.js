@@ -539,7 +539,8 @@ async function callGrok2APIImageEdit(provider, params) {
     const formData = new FormData();
     formData.append('model', params.model);
     formData.append('prompt', params.prompt);
-    formData.append('image', Buffer.from(sourceImageData.base64, 'base64'), {
+    // API expects image[] (array format)
+    formData.append('image[]', Buffer.from(sourceImageData.base64, 'base64'), {
         filename: 'source.png',
         contentType: sourceImageData.mimeType
     });
@@ -621,7 +622,8 @@ async function callGrok2APIVideo(provider, params) {
     formData.append('prompt', params.prompt);
 
     if (hasSourceImage && sourceImageBase64) {
-        formData.append('image', Buffer.from(sourceImageBase64.data, 'base64'), {
+        // API expects input_reference field for image-to-video
+        formData.append('input_reference', Buffer.from(sourceImageBase64.data, 'base64'), {
             filename: 'source.png',
             contentType: sourceImageBase64.mimeType
         });
