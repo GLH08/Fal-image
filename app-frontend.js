@@ -432,8 +432,8 @@ function openLightbox(data) {
     const mediaContainer = $('lightbox-media');
     const url = data.displayUrl || data.url;
 
+    const videoSrc = data.isVideo ? (url.startsWith('/api/proxy') ? url : `/api/proxy/video?url=${encodeURIComponent(url)}`) : null;
     if (data.isVideo) {
-        const videoSrc = url.startsWith('/api/proxy') ? url : `/api/proxy/video?url=${encodeURIComponent(url)}`;
         mediaContainer.innerHTML = `<video controls autoplay class="max-w-full max-h-[70vh] rounded-t-2xl"><source src="${videoSrc}" type="video/mp4"></video>`;
     } else {
         mediaContainer.innerHTML = `<img src="${url}" alt="Preview" class="max-w-full max-h-[70vh] object-contain rounded-t-2xl">`;
