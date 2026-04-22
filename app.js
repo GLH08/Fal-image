@@ -113,8 +113,8 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ['\'self\''],
-            styleSrc: ['\'self\'', '\'unsafe-inline\''],
-            scriptSrc: ['\'self\'', '\'unsafe-inline\'', '\'unsafe-eval\''],
+            styleSrc: ['\'self\'', '\'unsafe-inline\'', 'https://fonts.googleapis.com'],
+            scriptSrc: ['\'self\'', '\'unsafe-inline\'', '\'unsafe-eval\'', 'https://cdn.tailwindcss.com'],
             imgSrc: ['\'self\'', 'data:', 'https:', 'http:'],
             connectSrc: ['\'self\'', 'https:', 'http:'],
             fontSrc: ['\'self\'', 'https:', 'http:'],
