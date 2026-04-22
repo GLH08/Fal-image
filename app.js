@@ -693,8 +693,10 @@ async function pollVideoCompletion(provider, videoId, maxAttempts = 60, interval
         const job = await response.json();
 
         if (job.status === 'completed') {
-            // Get video content URL
-            const contentUrl = `${provider.baseUrl}/videos/${videoId}/content`;
+            // Use /v1/files/video format (same as Cherry Studio) - extract ID without "video_" prefix
+            // The job ID is like "video_9388d8ad..." but files are stored as "9388d8ad..."
+            const fileId = videoId.startsWith('video_') ? videoId.slice(6) : videoId;
+            const contentUrl = `${provider.baseUrl}/files/video?id=${fileId}`;
             console.log(`[Grok2API] Video completed: ${videoId}, content URL: ${contentUrl}`);
             return contentUrl;
         }
@@ -1126,16 +1128,27 @@ app.patch('/api/videos/:id/unhide', (req, res) => {
 // ==================== Video Proxy (CORS Fix + Caching) ====================
 
 const VIDEO_CACHE_DIR = path.join(DATA_DIR, 'video-cache');
+const IMAGE_CACHE_DIR = path.join(DATA_DIR, 'image-cache');
 
-// Ensure video cache directory exists
+// Ensure cache directories exist
 if (!fs.existsSync(VIDEO_CACHE_DIR)) {
     fs.mkdirSync(VIDEO_CACHE_DIR, { recursive: true });
+}
+if (!fs.existsSync(IMAGE_CACHE_DIR)) {
+    fs.mkdirSync(IMAGE_CACHE_DIR, { recursive: true });
 }
 
 // Simple URL-to-filename mapping (hash the URL for safe filename)
 function getCachePath(videoUrl) {
     const hash = crypto.createHash('md5').update(videoUrl).digest('hex');
     return path.join(VIDEO_CACHE_DIR, `${hash}.mp4`);
+}
+
+function getImageCachePath(imageUrl) {
+    const hash = crypto.createHash('md5').update(imageUrl).digest('hex');
+    const pathname = new URL(imageUrl).pathname;
+    const ext = path.extname(pathname) || '.jpg';
+    return path.join(IMAGE_CACHE_DIR, `${hash}${ext}`);
 }
 
 app.get('/api/proxy/video', async (req, res) => {
@@ -1193,6 +1206,82 @@ app.get('/api/proxy/video', async (req, res) => {
 
     } catch (error) {
         console.error('[Proxy] Video fetch error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ==================== Image Proxy (CORS Fix + Caching) ====================
+
+app.get('/api/proxy/image', async (req, res) => {
+    const { url } = req.query;
+    if (!url) {
+        return res.status(400).json({ error: 'Missing url parameter' });
+    }
+
+    // Validate URL
+    try {
+        new URL(url);
+    } catch {
+        return res.status(400).json({ error: 'Invalid url parameter' });
+    }
+
+    const cachePath = getImageCachePath(url);
+
+    // Check if image is already cached locally
+    if (fs.existsSync(cachePath)) {
+        console.log(`[Proxy] Serving image from cache: ${cachePath}`);
+        const stat = fs.statSync(cachePath);
+        const ext = path.extname(cachePath).toLowerCase();
+        const mimeTypes = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif',
+            '.webp': 'image/webp',
+            '.bmp': 'image/bmp',
+            '.svg': 'image/svg+xml'
+        };
+        res.setHeader('Content-Type', mimeTypes[ext] || 'image/jpeg');
+        res.setHeader('Content-Length', stat.size);
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        fs.createReadStream(cachePath).pipe(res);
+        return;
+    }
+
+    // Fetch from remote and cache
+    try {
+        console.log(`[Proxy] Fetching and caching image: ${url}`);
+
+        const imageResponse = await fetch(url);
+
+        if (!imageResponse.ok) {
+            return res.status(imageResponse.status).json({ error: 'Failed to fetch image' });
+        }
+
+        const buffer = await imageResponse.buffer();
+        const ext = path.extname(new URL(url).pathname) || '.jpg';
+        const finalCachePath = getImageCachePath(url);
+
+        fs.writeFileSync(finalCachePath, buffer);
+
+        const mimeTypes = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif',
+            '.webp': 'image/webp',
+            '.bmp': 'image/bmp',
+            '.svg': 'image/svg+xml'
+        };
+        res.setHeader('Content-Type', mimeTypes[ext] || 'image/jpeg');
+        res.setHeader('Content-Length', buffer.length);
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.end(buffer);
+
+    } catch (error) {
+        console.error('[Proxy] Image fetch error:', error);
         res.status(500).json({ error: error.message });
     }
 });
