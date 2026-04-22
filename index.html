@@ -7,7 +7,6 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15.477 0c.415 0 .749.338.788.752a7.775 7.775 0 006.985 6.984c.413.04.752.373.752.788v6.952c0 .415-.338.748-.752.788a7.775 7.775 0 00-6.985 6.984c-.04.414-.373.752-.788.752H8.525c-.416 0-.749-.338-.789-.752a7.775 7.775 0 00-6.984-6.984c-.414-.04-.752-.373-.752-.788V8.524c0-.415.338-.748.752-.788A7.775 7.775 0 007.736.752C7.776.338 8.11 0 8.526 0h6.95z' fill='%238B5CF6'/%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -356,7 +355,7 @@
             <div class="p-6 border-b" style="border-color: var(--glass-border);">
                 <div class="flex items-center gap-3">
                     <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #007AFF 0%, #BF5AF2 100%);">
-                        <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+                        <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 1 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 1 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 1 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 1 1-.963 0z"/></svg>
                     </div>
                     <div>
                         <h1 class="font-serif text-xl font-semibold" style="color: var(--text-primary);">AI Studio</h1>
@@ -366,30 +365,30 @@
             </div>
             <nav class="flex-1 p-4 space-y-1">
                 <button class="nav-btn active" data-tab="create">
-                    <i data-lucide="wand-2"></i>
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2"/><path d="M15 16v-2"/><path d="M8 9h2"/><path d="M20 9h2"/><path d="M17.8 11.8L19 13"/><path d="M15 9h.01"/><path d="M17.8 6.2L19 5"/><path d="m3 21 9-9"/><path d="M12.2 6.2L11 5"/></svg>
                     <span class="font-medium">Create</span>
                 </button>
                 <button class="nav-btn" data-tab="gallery">
-                    <i data-lucide="image"></i>
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
                     <span class="font-medium">Gallery</span>
                 </button>
                 <button class="nav-btn" data-tab="collection">
-                    <i data-lucide="folder"></i>
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                     <span class="font-medium">Collection</span>
                 </button>
                 <button class="nav-btn" data-tab="video">
-                    <i data-lucide="video"></i>
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
                     <span class="font-medium">Video</span>
                 </button>
             </nav>
             <div class="p-4 border-t" style="border-color: var(--glass-border);">
                 <!-- Theme Toggle -->
                 <button id="theme-toggle" class="glass-button w-full flex items-center justify-between px-4 py-3 mb-3 cursor-pointer">
-                    <span class="flex items-center gap-2">
-                        <i data-lucide="sun" class="w-4 h-4"></i>
+                    <span class="flex items-center gap-2" id="theme-icon-container">
+                        <svg class="w-4 h-4" id="theme-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
                         <span class="text-sm font-medium">Theme</span>
                     </span>
-                    <i data-lucide="moon" class="w-4 h-4" id="theme-icon"></i>
+                    <svg class="w-4 h-4" id="theme-icon-svg2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
                 </button>
                 <div class="glass p-4 rounded-xl">
                     <p class="text-xs" style="color: var(--text-tertiary);">Powered by</p>
@@ -404,12 +403,12 @@
             <div class="lg:hidden p-4 border-b flex items-center justify-between sticky top-0 z-30 glass" style="border-color: var(--glass-border);">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #007AFF 0%, #BF5AF2 100%);">
-                        <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
+                        <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 1 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 1 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 1 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 1 1-.963 0z"/></svg>
                     </div>
                     <h1 class="font-serif font-semibold text-lg" style="color: var(--text-primary);">AI Studio</h1>
                 </div>
                 <button id="mobile-menu-btn" class="glass-button p-2 cursor-pointer">
-                    <i data-lucide="menu" class="w-5 h-5"></i>
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
                 </button>
             </div>
 
@@ -553,7 +552,7 @@
                                 </h3>
                                 <textarea id="prompt" rows="5" placeholder="Describe your vision in detail..." class="glass-input resize-none"></textarea>
                                 <button id="generateBtn" class="btn-primary w-full mt-4 h-14 flex items-center justify-center gap-2">
-                                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 1 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 1 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 1 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 1 1-.963 0z"/></svg>
                                     Generate
                                 </button>
                             </div>
@@ -563,7 +562,7 @@
                             <div id="preview-area" class="glass min-h-[500px] flex items-center justify-center overflow-hidden">
                                 <div id="empty-state" class="text-center p-12 animate-fade-in">
                                     <div class="w-24 h-24 mx-auto mb-6 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, rgba(0,122,255,0.1), rgba(191,90,242,0.1));">
-                                        <i data-lucide="image-plus" class="w-12 h-12" style="color: var(--accent-blue); opacity: 0.6;"></i>
+                                        <svg class="w-12 h-12" style="color: var(--accent-blue); opacity: 0.6;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/><line x1="12" x2="12" y1="7" y2="13"/><line x1="9" x2="15" y1="10" y2="10"/></svg>
                                     </div>
                                     <h3 class="font-serif text-2xl font-medium mb-2" style="color: var(--text-primary);">Your Canvas Awaits</h3>
                                     <p class="text-secondary max-w-sm mx-auto">Configure your settings and describe your vision to bring your imagination to life.</p>
@@ -697,7 +696,7 @@
             <div class="glass max-w-3xl w-full animate-fade-in" style="border-radius: 24px;">
                 <div class="relative">
                     <button id="lightbox-close" class="glass-button absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center cursor-pointer">
-                        <i data-lucide="x" class="w-5 h-5"></i>
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
                     <div id="lightbox-media" class="flex items-center justify-center rounded-t-2xl min-h-[300px]" style="background: var(--bg-primary);"></div>
                 </div>
@@ -709,10 +708,10 @@
                     </div>
                     <div class="flex gap-2 pt-2">
                         <button id="lightbox-copy" class="glass-button flex-1 h-10 text-sm cursor-pointer">
-                            <i data-lucide="copy" class="w-4 h-4 inline mr-2"></i>Copy Prompt
+                            <svg class="w-4 h-4 inline mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Copy Prompt
                         </button>
                         <a id="lightbox-open" href="#" target="_blank" class="glass-button flex-1 h-10 text-sm flex items-center justify-center transition-colors">
-                            <i data-lucide="external-link" class="w-4 h-4 inline mr-2"></i>Open Original
+                            <svg class="w-4 h-4 inline mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>Open Original
                         </a>
                     </div>
                 </div>
@@ -726,18 +725,23 @@
 
         // Theme toggle
         const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
+        const themeIconSvg = document.getElementById('theme-icon-svg');
+        const themeIconSvg2 = document.getElementById('theme-icon-svg2');
         const html = document.documentElement;
+
+        const sunPath = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>';
+        const moonPath = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>';
 
         function setTheme(theme) {
             html.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
             if (theme === 'dark') {
-                themeIcon.setAttribute('data-lucide', 'moon');
+                themeIconSvg.innerHTML = moonPath;
+                themeIconSvg2.innerHTML = moonPath;
             } else {
-                themeIcon.setAttribute('data-lucide', 'sun');
+                themeIconSvg.innerHTML = sunPath;
+                themeIconSvg2.innerHTML = sunPath;
             }
-            lucide.createIcons();
         }
 
         // Load saved theme

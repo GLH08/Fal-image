@@ -259,10 +259,10 @@ function renderPreview(data) {
             <p class="text-sm line-clamp-2" style="color: var(--text-secondary);">${escapeHtml(data.prompt)}</p>
             <div class="flex gap-2">
                 <button class="copy-btn action-btn flex-1 h-10 text-sm cursor-pointer flex items-center justify-center gap-2">
-                    <i data-lucide="copy" class="w-4 h-4"></i>Copy
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Copy
                 </button>
                 <a href="${url}" target="_blank" class="action-btn flex-1 h-10 text-sm flex items-center justify-center gap-2">
-                    <i data-lucide="external-link" class="w-4 h-4"></i>Open
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>Open
                 </a>
             </div>
         </div>
@@ -272,7 +272,6 @@ function renderPreview(data) {
     }
     card.querySelector('.copy-btn').addEventListener('click', () => copyToClipboard(data.prompt));
     previewArea.appendChild(card);
-    lucide.createIcons({ nodes: card.querySelectorAll('[data-lucide]') });
 }
 
 // ==================== Manual Collection ====================
@@ -382,10 +381,10 @@ function renderCard(data, container, type) {
             <div class="flex items-center justify-between pt-2" style="border-top: 1px solid var(--glass-border);">
                 <span class="text-[10px]" style="color: var(--text-tertiary);">${date.toLocaleDateString('zh-CN')}</span>
                 <div class="flex gap-1">
-                    ${data.prompt ? `<button class="copy-btn action-btn w-8 h-8 flex items-center justify-center cursor-pointer" title="Copy Prompt"><i data-lucide="copy" class="w-4 h-4"></i></button>` : ''}
-                    <a href="${url}" target="_blank" class="open-btn action-btn w-8 h-8 flex items-center justify-center" title="Open in New Tab"><i data-lucide="external-link" class="w-4 h-4"></i></a>
-                    <button class="hide-btn action-btn w-8 h-8 flex items-center justify-center cursor-pointer" title="${isHidden ? 'Unhide' : 'Hide'}"><i data-lucide="${isHidden ? 'eye' : 'eye-off'}" class="w-4 h-4" style="${isHidden ? 'color: #8B5CF6;' : ''}"></i></button>
-                    <button class="delete-btn action-btn w-8 h-8 flex items-center justify-center cursor-pointer" title="Delete" style="--glass-bg: rgba(239,68,68,0.1);"><i data-lucide="trash-2" class="w-4 h-4" style="color: #EF4444;"></i></button>
+                    ${data.prompt ? `<button class="copy-btn action-btn w-8 h-8 flex items-center justify-center cursor-pointer" title="Copy Prompt"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></button>` : ''}
+                    <a href="${url}" target="_blank" class="open-btn action-btn w-8 h-8 flex items-center justify-center" title="Open in New Tab"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg></a>
+                    <button class="hide-btn action-btn w-8 h-8 flex items-center justify-center cursor-pointer" title="${isHidden ? 'Unhide' : 'Hide'}"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${isHidden ? '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>' : '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>'}</svg></button>
+                    <button class="delete-btn action-btn w-8 h-8 flex items-center justify-center cursor-pointer" title="Delete" style="--glass-bg: rgba(239,68,68,0.1);"><svg class="w-4 h-4" style="color: #EF4444;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
                 </div>
             </div>
         </div>
@@ -419,7 +418,6 @@ function renderCard(data, container, type) {
     });
 
     container.appendChild(card);
-    lucide.createIcons({ nodes: card.querySelectorAll('[data-lucide]') });
 }
 
 // ==================== Hide / Unhide ====================
@@ -466,7 +464,6 @@ function openLightbox(data) {
     $('lightbox-prompt').textContent = data.prompt || '(no prompt)';
     // "Open Original" should link to the original URL, not the proxy
     $('lightbox-open').href = url;
-    lucide.createIcons({ nodes: lb.querySelectorAll('[data-lucide]') });
 
     // Show source image link for I2V videos
     let sourceHtml = '';
@@ -513,9 +510,8 @@ function copyToClipboard(text) {
     function showToast() {
         const toast = document.createElement('div');
         toast.className = 'toast fixed bottom-6 right-6 px-5 py-3 shadow-lg z-[60] animate-fade-in flex items-center gap-2';
-        toast.innerHTML = '<i data-lucide="check" class="w-4 h-4" style="color: #10B981;"></i><span>Copied!</span>';
+        toast.innerHTML = '<svg class="w-4 h-4" style="color: #10B981;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Copied!</span>';
         document.body.appendChild(toast);
-        lucide.createIcons({ nodes: toast.querySelectorAll('[data-lucide]') });
         setTimeout(() => toast.remove(), 1500);
     }
 
