@@ -272,7 +272,7 @@ function renderPreview(data) {
     }
     card.querySelector('.copy-btn').addEventListener('click', () => copyToClipboard(data.prompt));
     previewArea.appendChild(card);
-    lucide.createIcons();
+    lucide.createIcons({ nodes: card.querySelectorAll('[data-lucide]') });
 }
 
 // ==================== Manual Collection ====================
@@ -384,7 +384,7 @@ function renderCard(data, container, type) {
                 <div class="flex gap-1">
                     ${data.prompt ? `<button class="copy-btn action-btn w-8 h-8 flex items-center justify-center cursor-pointer" title="Copy Prompt"><i data-lucide="copy" class="w-4 h-4"></i></button>` : ''}
                     <a href="${url}" target="_blank" class="open-btn action-btn w-8 h-8 flex items-center justify-center" title="Open in New Tab"><i data-lucide="external-link" class="w-4 h-4"></i></a>
-                    <button class="hide-btn action-btn w-8 h-8 flex items-center justify-center cursor-pointer ${isHidden ? '' : ''}" title="${isHidden ? 'Unhide' : 'Hide'}" style="${isHidden ? 'background: rgba(139,92,246,0.2);' : ''}"><i data-lucide="${isHidden ? 'eye' : 'eye-off'}" class="w-4 h-4" style="${isHidden ? 'color: #8B5CF6;' : ''}"></i></button>
+                    <button class="hide-btn action-btn w-8 h-8 flex items-center justify-center cursor-pointer" title="${isHidden ? 'Unhide' : 'Hide'}"><i data-lucide="${isHidden ? 'eye' : 'eye-off'}" class="w-4 h-4" style="${isHidden ? 'color: #8B5CF6;' : ''}"></i></button>
                     <button class="delete-btn action-btn w-8 h-8 flex items-center justify-center cursor-pointer" title="Delete" style="--glass-bg: rgba(239,68,68,0.1);"><i data-lucide="trash-2" class="w-4 h-4" style="color: #EF4444;"></i></button>
                 </div>
             </div>
@@ -419,7 +419,7 @@ function renderCard(data, container, type) {
     });
 
     container.appendChild(card);
-    lucide.createIcons();
+    lucide.createIcons({ nodes: card.querySelectorAll('[data-lucide]') });
 }
 
 // ==================== Hide / Unhide ====================
@@ -454,19 +454,19 @@ function openLightbox(data) {
     }
 
     const tagsHtml = `
-        <span class="px-3 py-1 text-xs font-medium bg-aurora-purple/20 text-aurora-purple rounded-full">${escapeHtml(data.model || 'Unknown')}</span>
-        ${data.provider ? `<span class="px-3 py-1 text-xs font-medium bg-aurora-cyan/20 text-aurora-cyan rounded-full">${escapeHtml(data.provider)}</span>` : ''}
-        ${data.aspectRatio ? `<span class="px-3 py-1 text-xs font-medium bg-white/10 text-zinc-300 rounded-full">${escapeHtml(data.aspectRatio)}</span>` : ''}
-        ${data.size ? `<span class="px-3 py-1 text-xs font-medium bg-white/10 text-zinc-300 rounded-full">${escapeHtml(data.size)}</span>` : ''}
-        ${data.type ? `<span class="px-3 py-1 text-xs font-medium bg-aurora-pink/20 text-aurora-pink rounded-full">${escapeHtml(data.type)}</span>` : ''}
-        <span class="px-3 py-1 text-xs font-medium bg-white/10 text-zinc-300 rounded-full">${new Date(data.timestamp).toLocaleString('zh-CN')}</span>
+        <span class="px-3 py-1 text-xs font-medium rounded-full" style="background: rgba(139,92,246,0.2); color: #8B5CF6;">${escapeHtml(data.model || 'Unknown')}</span>
+        ${data.provider ? `<span class="px-3 py-1 text-xs font-medium rounded-full" style="background: rgba(6,182,212,0.2); color: #06B6D4;">${escapeHtml(data.provider)}</span>` : ''}
+        ${data.aspectRatio ? `<span class="px-3 py-1 text-xs font-medium rounded-full" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);">${escapeHtml(data.aspectRatio)}</span>` : ''}
+        ${data.size ? `<span class="px-3 py-1 text-xs font-medium rounded-full" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);">${escapeHtml(data.size)}</span>` : ''}
+        ${data.type ? `<span class="px-3 py-1 text-xs font-medium rounded-full" style="background: rgba(236,72,153,0.2); color: #EC4899;">${escapeHtml(data.type)}</span>` : ''}
+        <span class="px-3 py-1 text-xs font-medium rounded-full" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);">${new Date(data.timestamp).toLocaleString('zh-CN')}</span>
     `;
     $('lightbox-tags').innerHTML = tagsHtml;
 
     $('lightbox-prompt').textContent = data.prompt || '(no prompt)';
     // "Open Original" should link to the original URL, not the proxy
     $('lightbox-open').href = url;
-    lucide.createIcons();
+    lucide.createIcons({ nodes: lb.querySelectorAll('[data-lucide]') });
 
     // Show source image link for I2V videos
     let sourceHtml = '';
@@ -515,7 +515,7 @@ function copyToClipboard(text) {
         toast.className = 'toast fixed bottom-6 right-6 px-5 py-3 shadow-lg z-[60] animate-fade-in flex items-center gap-2';
         toast.innerHTML = '<i data-lucide="check" class="w-4 h-4" style="color: #10B981;"></i><span>Copied!</span>';
         document.body.appendChild(toast);
-        lucide.createIcons();
+        lucide.createIcons({ nodes: toast.querySelectorAll('[data-lucide]') });
         setTimeout(() => toast.remove(), 1500);
     }
 
