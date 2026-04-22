@@ -28,6 +28,17 @@ const IMAGE_PROXY_WHITELIST = (process.env.IMAGE_PROXY_WHITELIST || '').split(',
 // Video proxy uses same whitelist as image proxy
 const VIDEO_PROXY_WHITELIST = IMAGE_PROXY_WHITELIST;
 
+// Helper: validate URL against whitelist (returns true if allowed, false if blocked)
+function isUrlAllowed(urlString, whitelist) {
+    if (whitelist.length === 0) return true; // Empty whitelist means allow all
+    try {
+        const parsed = new URL(urlString);
+        return whitelist.includes(parsed.hostname);
+    } catch {
+        return false;
+    }
+}
+
 // Image MIME types constant
 const IMAGE_MIME_TYPES = {
     '.jpg': 'image/jpeg',
@@ -535,6 +546,10 @@ async function callGrok2APIImageEdit(provider, params) {
     // Download source image and convert to base64
     let sourceImageData = null;
     if (params.sourceImageUrl) {
+        // SSRF protection: validate source URL against whitelist
+        if (!isUrlAllowed(params.sourceImageUrl, IMAGE_PROXY_WHITELIST)) {
+            throw new Error('Source image URL domain not allowed');
+        }
         try {
             const imgRes = await fetch(params.sourceImageUrl);
             const imgBuf = await imgRes.arrayBuffer();
@@ -614,6 +629,10 @@ async function callGrok2APIVideo(provider, params) {
     // Prepare source image for image-to-video
     let sourceImageBase64 = null;
     if (hasSourceImage && params.sourceImageUrl) {
+        // SSRF protection: validate source URL against whitelist
+        if (!isUrlAllowed(params.sourceImageUrl, IMAGE_PROXY_WHITELIST)) {
+            throw new Error('Source image URL domain not allowed');
+        }
         try {
             const imgRes = await fetch(params.sourceImageUrl);
             const imgBuf = await imgRes.arrayBuffer();
