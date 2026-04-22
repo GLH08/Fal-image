@@ -135,8 +135,6 @@ app.use('/api/', limiter);
 
 // Authentication Middleware
 app.use((req, res, next) => {
-    res.setHeader('Content-Security-Policy', 'default-src * \'unsafe-inline\' \'unsafe-eval\' data: blob:;');
-
     if (!AUTH_PASSWORD) return next();
 
     if (req.path === '/login.html' || req.path === '/api/login' || req.path === '/favicon.ico') {
