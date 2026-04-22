@@ -975,6 +975,11 @@ app.post('/api/images/manual', (req, res) => {
         return res.status(400).json({ error: 'Invalid URL format.' });
     }
 
+    const parsedUrl = new URL(url);
+    if (IMAGE_PROXY_WHITELIST.length > 0 && !IMAGE_PROXY_WHITELIST.includes(parsedUrl.hostname)) {
+        return res.status(403).json({ error: 'Domain not allowed. Please use a whitelisted domain.' });
+    }
+
     const id = 'manual-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 
     const imageRecord = {
@@ -1057,6 +1062,11 @@ app.post('/api/videos/text-to-video', (req, res) => {
         new URL(url);
     } catch {
         return res.status(400).json({ error: 'Invalid video URL format.' });
+    }
+
+    const parsedUrl = new URL(url);
+    if (IMAGE_PROXY_WHITELIST.length > 0 && !IMAGE_PROXY_WHITELIST.includes(parsedUrl.hostname)) {
+        return res.status(403).json({ error: 'Domain not allowed. Please use a whitelisted domain.' });
     }
 
     const id = 'video-t2v-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
