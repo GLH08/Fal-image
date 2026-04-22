@@ -1173,6 +1173,33 @@ if (!fs.existsSync(IMAGE_CACHE_DIR)) {
     fs.mkdirSync(IMAGE_CACHE_DIR, { recursive: true });
 }
 
+const VIDEO_CACHE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+// Clean up old cached videos on startup
+function cleanVideoCache() {
+    try {
+        const now = Date.now();
+        const files = fs.readdirSync(VIDEO_CACHE_DIR);
+        let cleaned = 0;
+        let cleanedBytes = 0;
+        for (const file of files) {
+            const filePath = path.join(VIDEO_CACHE_DIR, file);
+            const stat = fs.statSync(filePath);
+            if (now - stat.mtimeMs > VIDEO_CACHE_MAX_AGE_MS) {
+                cleanedBytes += stat.size;
+                fs.unlinkSync(filePath);
+                cleaned++;
+            }
+        }
+        if (cleaned > 0) {
+            console.log(`[Proxy] Cleaned ${cleaned} old cached videos (${(cleanedBytes / 1024 / 1024).toFixed(2)} MB)`);
+        }
+    } catch (err) {
+        console.error('[Proxy] Video cache cleanup error:', err.message);
+    }
+}
+cleanVideoCache();
+
 // Simple URL-to-filename mapping (hash the URL for safe filename)
 function getCachePath(videoUrl) {
     const hash = crypto.createHash('md5').update(videoUrl).digest('hex');
